@@ -92,21 +92,21 @@ def contactus():
 
 
 
-@app.route('/rbkreg', methods=["GET","POST"])
-def rbkreg():
+@app.route('/rbk_reg', methods=["GET","POST"])
+def rbk_reg():
     return render_template('rbkreg', title='RBK Registration form')
 
-@app.route('/ricemillreg', methods=["GET","POST"])
-def ricemillreg():
-    return render_template('ricemillreg', title='Ricemiller Registration form')
+@app.route('/ricemill_reg', methods=["GET","POST"])
+def ricemill_reg():
+    return render_template('ricemill_reg', title='Ricemiller Registration form')
 
-@app.route('/farmerreg', methods=["GET","POST"])
-def farmerreg():
-    return render_template('farmerreg', title='Farmer Registration form')
+@app.route('/farmer_reg', methods=["GET","POST"])
+def farmer_reg():
+    return render_template('farmer_reg', title='Farmer Registration form')
 
-@app.route('/transreg', methods=["GET","POST"])
-def transreg():
-    return render_template('transreg', title='Transport Registration form')
+@app.route('/transport_reg', methods=["GET","POST"])
+def transport_reg():
+    return render_template('transport_reg', title='Transport Registration form')
 
 
 
