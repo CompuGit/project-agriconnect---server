@@ -90,6 +90,8 @@ def contactus():
 
 
 
+
+
 @app.route('/rbkreg', methods=["GET","POST"])
 def rbkreg():
     return render_template('rbkreg', title='RBK Registration form')
@@ -105,6 +107,28 @@ def farmerreg():
 @app.route('/transreg', methods=["GET","POST"])
 def transreg():
     return render_template('transreg', title='Transport Registration form')
+
+
+
+
+
+
+@app.route('/rbk_index')
+def rbk_index():
+    return render_template('rbk_index', temp='')
+
+@app.route('/ricemill_index')
+def ricemill_index():
+    return render_template('ricemill_index', temp='')
+
+@app.route('/farmer_index')
+def farmer_index():
+    return render_template('farmer_index', temp='')
+
+@app.route('/transport_index')
+def transport_index():
+    return render_template('transport_index', temp='')
+
 
 if __name__=="__main__":
     app.run(debug=True)

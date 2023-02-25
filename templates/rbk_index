@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block container_content %}
+<div>
+    <center>
+      <button class="btn reverse" id="btn1">Farmer details</button>
+      <button class="btn" id="btn2">Data Base</button>
+      <button class="btn" id="btn3">Message Recieved</button>
+    </center>
+  </div>
+
+  <div id="form_1">
+    <form>
+      <center>
+          <!-- <h1 class="title"><u> Registration form 1</u></h1> -->
+          <input type="text"  autocomplete="off" class="formo" placeholder="Name" required> 
+          <input type="text"  autocomplete="off" class="formo" placeholder="Crop Type" required>
+          <input type="text"  autocomplete="off" class="formo" placeholder="No: of bags required" required>  
+          <input type="text"  autocomplete="off" class="formo" placeholder="Crop cut date" required>
+          <input type="text"  autocomplete="off" class="formo" placeholder="Crop Quality Check Date" required>
+          <input type="text"  autocomplete="off" class="formo" placeholder="Crop Sale Date" required>
+          <input type="text"  autocomplete="off" class="formo" placeholder="time of sending crop" required>
+          <input type="text"  autocomplete="off" class="formo" placeholder="Vehicals type" required>
+          <input type="text"  autocomplete="off" class="formo" placeholder="Vehicals Number" required>
+          <input type="text"  autocomplete="off" class="formo" placeholder="No: of bags Assigning" required>
+          <input type="text"  autocomplete="off" class="formo" placeholder="Ricemill Assigning" required>
+          <input type="text"  autocomplete="off" class="formo" placeholder="Amount for the crop" required>
+          <br><br>
+          <!-- <button type="button" class="bto"><b>SUBMIT</b></button><br><br> -->
+          <select class="formo" name="opening">
+            <option  class="op" value="select" id="co">--Select--</option>
+            <option value="Rbkreg.html" id="RBK" class="formo">Verified</option>
+            <option value="Rbkreg.html" id="RBK" class="formo"> Not Verified</option>
+          </select>
+      </center>
+    </form>
+  </div>
+
+  <div id="form_2" style="display: none;">
+    <form>
+      <center>
+        <button class="btn" id="btn4">Farmer Database</button>
+        <button class="btn" id="btn5">Ricemiller Database</button>
+        <button class="btn" id="btn6">Transport Database</button>
+      </center>
+    </form>
+  </div>
+
+  <div id="form_3" style="display: none;">
+    <form>
+      <center>
+          <!-- <h1 class="title"><u> Registration form 2</u></h1> -->
+          <input type="text"  autocomplete="off" class="formo" placeholder="At what date will he get the drop"> 
+          <input type="text"  autocomplete="off" class="formo" placeholder="No:of bags Coming"> 
+          <input type="text"  autocomplete="off" class="formo" placeholder="Quantity(No:of tons)"> 
+          <input type="text"  autocomplete="off" class="formo" placeholder="Owner of the crop">
+          <input type="text"  autocomplete="off" class="formo" placeholder="Vehical number">
+          <!-- <input type="text"  autocomplete="off" class="formo" placeholder="Village">    -->
+          <br><br><br><br>
+          <!-- <button type="button" class="bto"><b>SUBMIT</b></button><br><br> -->
+      </center>
+    </form>
+  </div>
+
+<script>
+
+  var btn1 = document.getElementById("btn1")
+  btn1.addEventListener('click', (event) =>{
+    event.preventDefault()
+    btn1.classList.add('reverse')
+    btn2.classList.remove('reverse')
+    btn3.classList.remove('reverse')
+    document.getElementById('form_1').style.display = "block"
+    document.getElementById('form_2').style.display = "none"
+    document.getElementById('form_3').style.display = "none"
+  })
+
+
+  var btn2 = document.getElementById("btn2")
+  btn2.addEventListener('click', (event) =>{
+    event.preventDefault()
+    btn2.classList.add('reverse')
+    btn1.classList.remove('reverse')
+    btn3.classList.remove('reverse')
+    document.getElementById('form_2').style.display = "block"
+    document.getElementById('form_1').style.display = "none"
+    document.getElementById('form_3').style.display = "none"
+  })
+
+  var btn3 = document.getElementById("btn3")
+  btn3.addEventListener('click',(event) =>{
+    event.preventDefault()
+    btn3.classList.add('reverse')
+    btn2.classList.remove('reverse')
+    btn1.classList.remove('reverse')
+    document.getElementById('form_3').style.display="block"
+    document.getElementById('form_2').style.display="none"
+    document.getElementById('form_1').style.display="none"
+
+  })
+
+
+</script>
+{% endblock %}
