@@ -1,0 +1,17 @@
+{% extends 'basereg.html' %}
+
+{% block form %}
+                    <h1 class="title"><u>{{ title }}</u></h1>
+                    <input type="text" required autocomplete="off" class="formo" placeholder="Name Of the Vehical Owner ">
+                    <input type="text" required autocomplete="off" class="formo" placeholder="Vehical Type "> 
+                    <input type="text" required autocomplete="off" class="formo" placeholder="Vehical Number">
+                    <input type="text" required autocomplete="off" class="formo" placeholder="Vehical Record is avaliable or not">
+                    <input type="text" required autocomplete="off" class="formo" placeholder="Vehical Record">
+                    <input type="text" required autocomplete="off" class="formo" placeholder="Phone number ">
+                    <input type="text" required autocomplete="off" class="formo" placeholder="Set new password">  
+                    <input type="text" required autocomplete="off" class="formo" placeholder="Conform password">  
+                    <input type="text" required autocomplete="off" class="formo" placeholder="+vehical">  
+                    
+                    <br><br><br><br>
+                    <button type="button" class="bto"><b>SUBMIT</b></button><br><br>
+{% endblock %}
