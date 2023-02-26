@@ -33,9 +33,9 @@ def login_required(func):
 def index():
     active_user = session.get('active_user')
     if active_user['user_type']=='farmer': return redirect('/farmer_index')
-    if active_user['user_type']=='transport': return render_template('transport_index', temp=active_user)
-    if active_user['user_type']=='ricemill': return render_template('ricemill_index', temp=active_user)
-    if active_user['user_type']=='rbk': return render_template('rbk_index', temp=active_user)
+    if active_user['user_type']=='transport': return redirect('/transport_index')
+    if active_user['user_type']=='ricemill': return redirect('/ricemill_index')
+    if active_user['user_type']=='rbk': return redirect('/rbk_index')
     
     return render_template('base.html', temp=active_user)
 
@@ -145,7 +145,18 @@ def farmer_index():
 
 @app.route('/transport_index')
 def transport_index():
-    return render_template('transport_index', temp='')
+    con = get_db()
+
+    active_user = session.get('active_user')
+    phone = active_user['phone']
+
+    cursor = con.execute(f'SELECT * FROM transport_owners where phone="{ phone }"')
+    transport_owner_details = [dict(each) for each in cursor.fetchall()]
+    
+    cursor = con.execute(f'SELECT * FROM transport_queue where d_phone="{ phone }"')
+    queue = [dict(each) for each in cursor.fetchall()]
+     
+    return render_template('transport_index', user_details=transport_owner_details[0], queue=queue)
 
 
 if __name__=="__main__":

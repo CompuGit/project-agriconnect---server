@@ -51,7 +51,7 @@
     .track_tables > table, td, th {
       border:solid rgb(49,198,49) 2px;
     }
-    .track_tables > .no-border td, .no-border th {
+    .no-border td, .no-border th {
       border: none;
       padding: 5px;
     }
@@ -74,7 +74,14 @@
 </style>
 {% endblock %}
 
-{% block user_details_table %} {% endblock %}
+{% block user_details_table %}
+        <table class="no-border" style="border:none; text-align: left;" >
+          <tr> <td><b>Name : </b></td>    <td colspan="3">{{ user_details['fullname'] }}</td></tr>
+          <tr> <td><b>Phone : </b></td>   <td>{{ user_details['phone'] }}</td>  <td><b>Mandal : </b></td>  <td>{{ user_details['mandal'] }}</td> <td><b>Village : </b></td>  <td>{{ user_details['village'] }}</td> </tr>
+          <tr> <td><b>Address : </b></td> <td colspan="5">{{ user_details['address'] }}</td></tr>
+          <tr> <td><b>Vehicle Type : </b></td>   <td>{{ user_details['vehicle_type'] }}</td>  <td><b>Vehical No. : </b></td>  <td>{{ user_details['vehicle_no'] }}</td> <td><b>Vehicle Record : </b></td>  <td>{{ user_details['vehicle_rec'] }}</td> </tr>
+        </table>
+{% endblock %}
 
 {% block container_content %}
 <div>
@@ -96,7 +103,7 @@
     <script src="{{ url_for('static',filename='js/jquery-3.6.0.min.js') }}"></script>
     <script src="{{ url_for('static',filename='js/jquery-ui.min.js') }}"></script>
     <script>
-      var selectedDates = ['2023-02-10'];
+      var selectedDates = {{ user_details['available_dates'] }};
       $(function() {
         $("#calendar-container").datepicker({
           dateFormat: "yy-mm-dd",
@@ -181,28 +188,39 @@
               <th>Time Slot</th>
               <th> From (Customer Location)</th>
               <th>To (Mill Location)</th>
-              <th>Vehical Type</th>
-              <th>Vehical No.</th>
+              <th>Vehicle Type</th>
+              <th>Vehicle No.</th>
               <th>Trip Status</th>
 
             </tr>
+            {% for row in queue %}
             <tr>
-              <td>300104</td>
-              <td>Poorna</td>
-              <td>9876543210</td>
-              <td>10-03-2023</td>
-              <td>4:30 PM</td>
-              <td>1-121, chilakalapudi, machilipatnam</td>
-              <td>ABC Mill MTM</td>
-              <td>Tractor</td>
-              <td>AP 15 AZ 0001</td>
-              <td><select style="border:solid rgb(49,198,49) 2px; padding:5px; border-radius: 10px; text-align: center;">
-                    <option> Pending </option>
-                    <option> Completed </option>
+              <td>{{ row['track_id'] }}</td>
+              <td>{{ row['c_fullname'] }}</td>
+              <td>{{ row['c_phone'] }}</td>
+              <td>{{ row['date_booked'] }}</td>
+              <td>{{ row['time_slot'] }}</td>
+              <td>{{ row['from_'] }}</td>
+              <td>{{ row['to_'] }}</td>
+              <td>{{ row['vehicle_type'] }}</td>
+              <td>{{ row['vehicle_no'] }}</td>
+              {% if row['staus']=='completed' %}
+              <td><select style="border:solid rgb(49,198,49) 2px; padding:5px; border-radius: 10px; text-align: center; background-color: rgb(49,198,49);">
+                    <option value="completed"> Completed </option>
+                  </select>
+                  <button style="border:solid rgb(49,198,49) 2px; padding:5px; border-radius: 10px; background-color: rgb(49,198,49); color:white; cursor: pointer;" disabled >Update</button>
+              </td>
+              {% else %}
+              <td><select style="border:solid rgb(49,198,49) 2px; padding:5px; border-radius: 10px; text-align: center; background-color: yellow;"
+                    onchange="if(this.value==='completed'){this.style.backgroundColor = 'rgb(49,198,49)';}else{this.style.backgroundColor = 'yellow';}">
+                    <option value="pending" selected> Pending </option>
+                    <option value="completed"> Completed </option>
                   </select>
                   <button style="border:solid rgb(49,198,49) 2px; padding:5px; border-radius: 10px; background-color: rgb(49,198,49); color:white; cursor: pointer;" >Update</button>
               </td>
-            </tr>            
+            </tr>
+            {% endif %}
+            {% endfor %}            
           </table>
       </center>
     </div>

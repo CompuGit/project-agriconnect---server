@@ -80,3 +80,39 @@ VALUES(9876, '456', 'paddy', '21-01-2023', '31-01-2023', '14-02-2023', 28, 19000
 INSERT INTO crops_queue (crop_id, survey_no, crop_type, cut_date, qc_date, bags, status)
 VALUES(9898, '123','rice', '21-01-2023', '31-01-2023', 30, 'processing'); 
 
+
+
+CREATE TABLE IF NOT EXISTS transport_owners (
+    id INTEGER PRIMARY KEY,
+    _username TEXT,
+    fullname TEXT,
+    phone TEXT,
+    address TEXT,
+    mandal TEXT,
+    village TEXT,
+    vehicle_type TEXT,
+    vehicle_no TEXT,
+    vehicle_rec TEXT,
+    available_dates JSON);
+
+INSERT INTO transport_owners (_username, fullname, phone, address, mandal, village, vehicle_type, vehicle_no, vehicle_rec, available_dates)
+VALUES('jeswanth', 'Jeswanth M', '9999888877', '1-121, chilakalpudi, machilipatnam', 'bandar', 'chilakalapudi', 'Tractor', 'AP 16 AZ 1234', 'Not provided yet', '["2023-02-28","2023-03-05"]');
+
+
+CREATE TABLE IF NOT EXISTS transport_queue (
+    track_id INTEGER PRIMARY KEY,
+    crop_id INTEGER,
+    c_fullname TEXT,
+    c_phone TEXT,
+    d_fullname TEXT,
+    d_phone TEXT,
+    date_booked TEXT,
+    time_slot TEXT,
+    from_ TEXT,
+    to_ TEXT,
+    vehicle_type TEXT,
+    vehicle_no TEXT,
+    status TEXT);
+
+INSERT INTO transport_queue (track_id, crop_id, c_fullname, c_phone, d_fullname, d_phone, date_booked, time_slot, from_, to_, vehicle_type, vehicle_no, status)
+VALUES(300104, 9898, 'Poorna Venkata Sai L', '9876543210', 'Jeswanth M', '9999888877', '2023-03-05', '4:30 PM', '1-121, chilakalpudi, machilipatnam', 'ABC Mill MTM', 'Tractor', 'AP 16 AZ 1234', 'completed' );
