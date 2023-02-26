@@ -98,7 +98,7 @@
     </div>
 
     <div id="form_2" style="display: none;">
-      <div  style="width: 100%; border:none; margin-top:50px;">
+      <div  style="width: 90%; border:none; margin: 50px auto;">
         <center>
             <table>
               <tr>
@@ -119,6 +119,35 @@
                 {% endfor %}
               </tr>
               {% endfor %}
+            </table>
+        </center>
+      </div>
+
+      <div  style="width: 60%; border:none; margin: 50px auto;">
+        <center>
+            <table>
+              <tr>
+                <th>Crop ID</th>
+                <th>Track ID</th>
+                <th>Vehicle Type</th>
+                <th>Vehical No.</th>
+                <th>RiceMill</th>
+              </tr>
+              <tr>
+                <td>9898</td>
+                <td>300104</td>
+                <td>Tractor</td>
+                <td>AP 15 AZ 0001</td>
+                <td>ABC MILL MTM</td>
+              </tr>
+              <tr>
+                <td>9876</td>
+                <td>289979</td>
+                <td>Lorry</td>
+                <td>AP 12 XZ 1010</td>
+                <td>ABC MILL Pedana</td>
+              </tr>
+              
             </table>
         </center>
       </div>

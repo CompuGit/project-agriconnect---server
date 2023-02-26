@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Index</title>
+    <title>AgriConnect</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/base_styles.css') }}">
-    {% block added_styles %}{% endblock %}
+    <link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
+    {% block added_styles %} {% endblock %}
 </head>
 
 <body>
-	<header id="bg_img" style="">
+	<header id="bg_img">
     <div style="display: flex; justify-content: flex-end; align-items: center; padding:5px;">
-      <div style="max-width:750px; max-height: 180px;margin-right:50px;">
-        {% block user_details_table %}
-        {% endblock %}
+      <div style="max-width:750px; min-height: 180px; margin-right:50px;">
+        {% block user_details_table %} {% endblock %}
       </div>
     
       <div style="max-width: 400px; margin-right: 100px;">
