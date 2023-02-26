@@ -5,16 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Index</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/base_styles.css') }}">
+    {% block added_styles %}{% endblock %}
 </head>
 
 <body>
-	<header id="bg_img" style="display: flex; direction: rtl;">
-    <div style="display: flex; flex-flow: row; align-items: center; margin-right:50px;">
-			  <a href="/logout" class="btn reverse">Logout <span class="logout-symbol">&#10162;</span></a>
+	<header id="bg_img" style="">
+    <div style="display: flex; justify-content: flex-end; align-items: center; padding:5px;">
+      <div style="max-width:750px; max-height: 180px;margin-right:50px;">
+        {% block user_details_table %}
+        {% endblock %}
+      </div>
+    
+      <div style="max-width: 400px; margin-right: 100px;">
         <a href="/contactus" class="btn reverse">Contact Us</a>
-		</div>
-    <div style="min-width:500px; max-height:180px; border:solid grey 1px;margin-right:100px; padding:5px;">
-      {{ temp }}
+        <a href="/logout" class="btn reverse"><span class="logout-symbol">&#10162;</span> &nbsp; Logout</a>
+      </div>
     </div>
   </header>
 

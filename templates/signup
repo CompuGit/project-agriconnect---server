@@ -18,10 +18,10 @@
                 
                 <select class="formo" name="opening">
                     <option  style="color:grey">--Select--</option>
-                    <option value="/rbkreg"  >RBK</option>
-                    <option value="/ricemillreg"  >Rice Miller</option>
-                    <option value="/farmerreg" >Farmer</option>
-                    <option value="/transreg" >Transport Owner</option>
+                    <option value="/rbk_reg"  >RBK</option>
+                    <option value="/ricemill_reg"  >Rice Miller</option>
+                    <option value="/farmer_reg" >Farmer</option>
+                    <option value="/transport_reg" >Transport Owner</option>
                 </select>
 
                 <br><br><br><br>

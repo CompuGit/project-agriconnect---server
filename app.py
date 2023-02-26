@@ -32,7 +32,7 @@ def login_required(func):
 @login_required
 def index():
     active_user = session.get('active_user')
-    if active_user['user_type']=='farmer': return render_template('farmer_index', temp=active_user)
+    if active_user['user_type']=='farmer': return redirect('/farmer_index')
     if active_user['user_type']=='transport': return render_template('transport_index', temp=active_user)
     if active_user['user_type']=='ricemill': return render_template('ricemill_index', temp=active_user)
     if active_user['user_type']=='rbk': return render_template('rbk_index', temp=active_user)
@@ -46,7 +46,7 @@ def login():
     if not session.get('logged_in'):
         if request.method=='POST':
             form = request.form
-            form_username = form['username']
+            form_phone = form['username']
             form_password = form['password']
 
             con = get_db()
@@ -56,13 +56,13 @@ def login():
             for row in rows:
                 db_user = dict(row)
 
-                if form_username == db_user['username'] and form_password == db_user['password']:
+                if form_phone == db_user['phone'] and form_password == db_user['password']:
                     session['logged_in'] = True
                     del db_user['password']
                     session['active_user'] = db_user
                     return redirect('/')
-                else:
-                    return render_template('login', alert_script='<script>alert("Invalid login credentials. Retry again.")</script>')
+            else:
+                return render_template('login', alert_script='<script>alert("Invalid login credentials. Retry again.")</script>')
         else:
             return render_template('login', alert_script='')
     else:
@@ -94,7 +94,7 @@ def contactus():
 
 @app.route('/rbk_reg', methods=["GET","POST"])
 def rbk_reg():
-    return render_template('rbkreg', title='RBK Registration form')
+    return render_template('rbk_reg', title='RBK Registration form')
 
 @app.route('/ricemill_reg', methods=["GET","POST"])
 def ricemill_reg():
@@ -123,7 +123,25 @@ def ricemill_index():
 
 @app.route('/farmer_index')
 def farmer_index():
-    return render_template('farmer_index', temp='')
+    con = get_db()
+
+    active_user = session.get('active_user')
+    phone = active_user['phone']
+
+    cursor = con.execute(f'SELECT * FROM farmers where phone="{ phone }"')
+    farmer_details = [dict(each) for each in cursor.fetchall()]
+
+    
+    cursor = con.execute(f'SELECT * FROM surveys where phone="{ phone }"')
+    surveys = [dict(each) for each in cursor.fetchall()]
+    crops = []
+    for each_survey in surveys:
+        survey_no = each_survey['survey_no']
+        cursor = con.execute(f'SELECT * FROM crops_queue where survey_no="{ survey_no }"')
+        for each in cursor.fetchall():
+            crops.append(dict(each))
+    
+    return render_template('farmer_index', user_details=farmer_details[0], surveys=surveys, crops=crops)
 
 @app.route('/transport_index')
 def transport_index():
