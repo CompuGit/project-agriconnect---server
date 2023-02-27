@@ -1,4 +1,5 @@
 import sqlite3
+from functools import wraps
 from flask import Flask, g, request, session, redirect, url_for, jsonify, render_template
 
 app = Flask(__name__)
@@ -19,6 +20,7 @@ def close_db(error):
 
 
 def login_required(func):
+    @wraps(func)
     def wraper(*args,**kwargs):
         if session.get('logged_in'):
             return func(*args, **kwargs)
@@ -111,6 +113,19 @@ def transport_reg():
 
 
 
+@app.route('/msg', methods=["POST","GET"])
+@login_required
+def send_msg():
+    if request.method=="POST":
+        data = request.get_json()
+
+        con = get_db()
+        con.execute(f'INSERT INTO messages (c_fullname, c_phone, survey_no, message) VALUES (?,?,?,?)', (data['c_fullname'], data['c_phone'], data['survey_no'], data['message']) )
+        con.commit()
+
+        return jsonify({'status':'ok'})
+
+
 
 
 @app.route('/rbk_index')
@@ -157,6 +172,28 @@ def transport_index():
     queue = [dict(each) for each in cursor.fetchall()]
      
     return render_template('transport_index', user_details=transport_owner_details[0], queue=queue)
+
+
+@app.route('/transport_update/<type_>', methods=["POST","GET"])
+def transport_update(type_):
+    if request.method=="POST":
+        if type_=='available_dates':
+            data = request.get_json()
+
+            con = get_db()
+            con.execute(f'UPDATE transport_owners SET available_dates=? WHERE phone=?', ( data['available_dates'], data['phone']) )
+            con.commit()
+
+            return jsonify({'status':'ok'})
+        if type_=='track_status':
+            data = request.get_json()
+            print(data)
+
+            con = get_db()
+            con.execute(f'UPDATE transport_queue SET status=? WHERE track_id=?', ( data['status'], data['track_id']) )
+            con.commit()
+
+            return jsonify({'status':'ok'})
 
 
 if __name__=="__main__":

@@ -1,3 +1,13 @@
+CREATE TABLE IF NOT EXISTS messages (
+    id INTEGER PRIMARY KEY,
+    c_fullname TEXT,
+    c_phone TEXT,
+    survey_no INTEGER,
+    message TEXT,
+    rbk_user TEXT,
+    status TEXT);
+
+
 CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY,
     _username TEXT,
@@ -93,7 +103,7 @@ CREATE TABLE IF NOT EXISTS transport_owners (
     vehicle_type TEXT,
     vehicle_no TEXT,
     vehicle_rec TEXT,
-    available_dates JSON);
+    available_dates TEXT);
 
 INSERT INTO transport_owners (_username, fullname, phone, address, mandal, village, vehicle_type, vehicle_no, vehicle_rec, available_dates)
 VALUES('jeswanth', 'Jeswanth M', '9999888877', '1-121, chilakalpudi, machilipatnam', 'bandar', 'chilakalapudi', 'Tractor', 'AP 16 AZ 1234', 'Not provided yet', '["2023-02-28","2023-03-05"]');

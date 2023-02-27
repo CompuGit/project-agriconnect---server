@@ -5,7 +5,7 @@
     <center>
       <button class="btn reverse" id="btn1">Farmer details</button>
       <button class="btn" id="btn2">Data Base</button>
-      <button class="btn" id="btn3">Message Recieved</button>
+      <button class="btn" id="btn3">Messages</button>
     </center>
   </div>
 
@@ -49,15 +49,14 @@
   <div id="form_3" style="display: none;">
     <form>
       <center>
-          <!-- <h1 class="title"><u> Registration form 2</u></h1> -->
-          <input type="text"  autocomplete="off" class="formo" placeholder="At what date will he get the drop"> 
-          <input type="text"  autocomplete="off" class="formo" placeholder="No:of bags Coming"> 
-          <input type="text"  autocomplete="off" class="formo" placeholder="Quantity(No:of tons)"> 
-          <input type="text"  autocomplete="off" class="formo" placeholder="Owner of the crop">
-          <input type="text"  autocomplete="off" class="formo" placeholder="Vehical number">
-          <!-- <input type="text"  autocomplete="off" class="formo" placeholder="Village">    -->
-          <br><br><br><br>
-          <!-- <button type="button" class="bto"><b>SUBMIT</b></button><br><br> -->
+          <table>
+            <tr>
+              <th>Farmer Name</th>
+              <th>Farmer Phone</th>
+              <th>Survey No.</th>
+              <th>Message</th>
+            </tr>
+          </table>
       </center>
     </form>
   </div>

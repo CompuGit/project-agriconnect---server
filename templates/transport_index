@@ -168,8 +168,28 @@
         });
         $("#calendar-container .ui-datepicker-trigger").click(); // trigger click on datepicker icon to show calendar
         $("#date-picker").hide(); // hide input field
-        $("#submit-button").click(function() {
-            console.log(selectedDates); // replace with your own code to process the selected dates
+        $("#submit-button").click( async () => {
+              var fullname = "{{ user_details['fullname'] }}"
+              var phone = "{{ user_details['phone'] }}"
+                let source = '/transport_update/available_dates'
+                let payload = { 
+                    method: "POST",
+                    headers: {
+                              'Content-Type': 'application/json'
+                              },
+                    body: JSON.stringify({
+                                "fullname": `${fullname}`,
+                                "phone": `${phone}`,
+                                "available_dates": JSON.stringify(selectedDates), 
+                            }) 
+                    }
+
+                const response = await fetch(source,payload);
+                const data = await response.json()
+                      if (data['status']=='ok'){
+                        alert('Avalialbe dates Uppdated.')
+                        window.location.reload()
+                      }
         });
       });
     </script>
@@ -204,22 +224,40 @@
               <td>{{ row['to_'] }}</td>
               <td>{{ row['vehicle_type'] }}</td>
               <td>{{ row['vehicle_no'] }}</td>
-              {% if row['staus']=='completed' %}
-              <td><select style="border:solid rgb(49,198,49) 2px; padding:5px; border-radius: 10px; text-align: center; background-color: rgb(49,198,49);">
-                    <option value="completed"> Completed </option>
+              <td><select style="border:solid rgb(49,198,49) 2px; padding:5px; border-radius: 10px; text-align: center; ">
+                    <option value="Pending" {% if row['status']=='pending' %} selected {% endif %}> Pending </option>
+                    <option value="Completed" {% if row['status']=='Completed' %} selected {% endif %}> Completed </option>
                   </select>
-                  <button style="border:solid rgb(49,198,49) 2px; padding:5px; border-radius: 10px; background-color: rgb(49,198,49); color:white; cursor: pointer;" disabled >Update</button>
-              </td>
-              {% else %}
-              <td><select style="border:solid rgb(49,198,49) 2px; padding:5px; border-radius: 10px; text-align: center; background-color: yellow;"
-                    onchange="if(this.value==='completed'){this.style.backgroundColor = 'rgb(49,198,49)';}else{this.style.backgroundColor = 'yellow';}">
-                    <option value="pending" selected> Pending </option>
-                    <option value="completed"> Completed </option>
-                  </select>
-                  <button style="border:solid rgb(49,198,49) 2px; padding:5px; border-radius: 10px; background-color: rgb(49,198,49); color:white; cursor: pointer;" >Update</button>
-              </td>
+                  <button onclick="track_update(this)" style="border:solid rgb(49,198,49) 2px; padding:5px; border-radius: 10px; background-color: rgb(49,198,49); color:white; cursor: pointer;" >Update</button>
+                  <script>
+                    const track_update = async (ele) => {
+                      var select_node = ele.previousElementSibling
+                      var track_id = ele.parentNode.parentNode.childNodes[1].textContent
+                      
+                      var fullname = "{{ user_details['fullname'] }}"
+                      var phone = "{{ user_details['phone'] }}"
+                        let source = '/transport_update/track_status'
+                        let payload = { 
+                            method: "POST",
+                            headers: {
+                                      'Content-Type': 'application/json'
+                                      },
+                            body: JSON.stringify({
+                                        "track_id": track_id,
+                                        "status": `${select_node.value}`
+                                    }) 
+                            }
+
+                        const response = await fetch(source,payload);
+                        const data = await response.json()
+                              if (data['status']=='ok'){
+                                alert(`Track ID : ${track_id} Status Uppdated.`)
+                                window.location.reload()
+                              }
+                      }
+                  </script>
+                </td>
             </tr>
-            {% endif %}
             {% endfor %}            
           </table>
       </center>

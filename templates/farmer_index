@@ -154,21 +154,50 @@
     </div>
 
     <div id="form_3" style="display: none;">
-      <form style="border:none; width:70%">
+      <form style="border:none; width:70%" >
         <center>
             <!-- <h1 class="title"><u> Registration form 1</u></h1> -->
             <fieldset><legend >Select Survey Number </legend>
-              <select name="survey_no" class="formo">
+              <select id="msg_survey_no" class="formo">
                 {% for each in surveys %}
                 <option value="{{ each['survey_no'] }}"> {{ each['survey_no'] }} </option>
                 {% endfor %}
               </select>
             </fieldset>
             <fieldset><legend > Enter your Message </legend>
-              <textarea name="message" class="" style="width:100%; height:200px; border:none;" onfocus="this.style.outline='none'"></textarea>
+              <textarea id="msg_content" class="" style="width:100%; height:200px; border:none;" onfocus="this.style.outline='none'"></textarea>
             </fieldset> 
             <br><br><br><br>
-            <button type="button" class="btn reverse"><b>SUBMIT</b></button><br><br>
+            <button type="button" onclick="send_msg()" class="btn reverse"><b>SUBMIT</b></button><br><br>
+            <script>
+              var c_fullname = "{{ user_details['fullname'] }}"
+              var c_phone = "{{ user_details['phone'] }}"
+               send_msg = async ()=>{
+                let msg_survey_no = document.getElementById('msg_survey_no')
+                let msg_content = document.getElementById('msg_content')
+
+                let source = '/msg'
+                let payload = { 
+                    method: "POST",
+                    headers: {
+                              'Content-Type': 'application/json'
+                              },
+                    body: JSON.stringify({
+                                "c_fullname": `${c_fullname}`,
+                                "c_phone": `${c_phone}`,
+                                "survey_no": `${msg_survey_no.value}`, 
+                                "message": `${msg_content.value}` 
+                            }) 
+                    }
+
+                const response = await fetch(source,payload);
+                const data = await response.json()
+                      if (data['status']=='ok'){
+                        alert('Message sent to RBK.')
+                        msg_content.value = ''
+                      }
+              }
+            </script>
         </center>
       </form>
     </div>
