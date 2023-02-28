@@ -1,46 +1,6 @@
 {% extends 'base.html' %}
 
 {% block added_styles %}
-  <style>
-    fieldset{
-      width:500px;
-      border:solid rgb(49,198,49) 2px;
-      border-radius: 20px;
-      color:rgb(49,198,49);
-      font-size: large;
-      font-weight: bold;
-      margin: 10px;
-      height: fit-content;;
-    }
-    .flex_box_row_wrap{
-      display: flex;
-    }
-
-    .track_tables > table, td, th {
-      border:solid rgb(49,198,49) 2px;
-    }
-    .no-border td, .no-border th {
-      border: none;
-      padding: 5px;
-    }
-    table.track_tables {
-      width: 100%;
-      text-align: center;
-      font-size: larger;
-      border-collapse: collapse;
-    }
-    .track_tables > th, td {
-      padding:10px 5px;
-    }
-    .track_tables  tr>th{
-      background-color: rgb(49,198,49);
-      color: white;
-      font-size: larger;
-      border-right: solid white 2px;
-      border-top: solid white 3px;
-    }
-  </style>
-
 {% endblock %}
 
 {% block user_details_table %}
@@ -60,13 +20,14 @@
       <center>
         <button class="btn reverse" id="btn1">Queue</button>
         <button class="btn" id="btn2">Update Mill</button>
+        <button class="btn" id="btn3">Message to RBK</button>
       </center>
     </div>
 
     <div id="form_1" >
       <div  style="width: 90%; border:none; margin: 50px auto;">
         <center>
-            <table class="track_tables">
+            <table>
               <tr>
                 <th colspan="6">Load Details</th>
                 <th colspan="5">Transport Details</th>
@@ -121,7 +82,7 @@
     <div id="form_2" style="display: none;">
       <form style="border:none; width:90%;"
             onsubmit="mill_update(this)">
-            <center style=" display: flex; flex-direction: row; ">
+            <center class="flex_box_row_wrap">
               <fieldset><legend >Storage Capacity (in BAGS) </legend>
                 <input type="text" class="formo" name="storage_capacity" value="{{ user_details['storage_capacity'] }}">
               </fieldset>
@@ -133,81 +94,30 @@
               </fieldset>
             </center>
             <br><br><br>
-            <button type="submit" class="btn reverse" style="width:50%;margin:auto"><b>SUBMIT</b></button><br><br> -->
-        
+            <button type="submit" class="btn reverse" style="width:50%;margin:auto"><b>SUBMIT</b></button><br><br>
+
+            <script src="{{ url_for('static',filename='js/updates.js') }}"></script>
       </form>
     </div>
 
-    <script>
-      const bags_status = async (id, status) => {
-        
-          let source = '/mill_update/bags_status'
-          let payload = { 
-              method: "POST",
-              headers: {
-                        'Content-Type': 'application/json'
-                        },
-              body: JSON.stringify({
-                          "id": id,
-                          "no_of_bags":document.getElementById('d3f4').textContent,
-                          "status": status
-                      }) 
-              }
+    <div id="form_3" style="display: none;">
+      <form style="border:none; width:70%" >
+        <center>
+            <!-- <h1 class="title"><u> Registration form 1</u></h1> -->
+            <fieldset><legend > Enter your Message </legend>
+              <textarea id="msg_content" class="" style="width:100%; height:200px; border:none;" onfocus="this.style.outline='none'"></textarea>
+            </fieldset> 
+            <br><br><br>
+            <button type="button" onclick="send_msg()" class="btn reverse"><b>SUBMIT</b></button><br>
+        </center>
+      </form>
+    </div>
 
-          const response = await fetch(source,payload);
-          const data = await response.json()
-                if (data['status']=='ok'){
-                  alert(`Bags Status Updated Successfully.`)
-                  window.location.reload()
-                }
-        }
-
-        const mill_update = async (form) => {
-        
-        let source = '/mill_update/mill'
-        let payload = { 
-            method: "POST",
-            headers: {
-                      'Content-Type': 'application/json'
-                      },
-            body: JSON.stringify({
-                        "storage_capacity": form['storage_capacity'].value,
-                        "milling_capacity": form['milling_capacity'].value,
-                        "dispatched_bags": form['dispatched_bags'].value
-
-                    }) 
-            }
-        const response = await fetch(source,payload);
-        const data = await response.json()
-              if (data['status']=='ok'){
-                alert(`Mill Details Updated Successfully.`)
-                window.location.reload()
-              }
-      }
-    </script>
-   
 
   <script>
-
-    var btn1 = document.getElementById("btn1")
-    btn1.addEventListener('click', (event) =>{
-      event.preventDefault()
-      btn1.classList.add('reverse')
-      btn2.classList.remove('reverse')
-      document.getElementById('form_1').style.display = "block"
-      document.getElementById('form_2').style.display = "none"
-    })
-
-
-    var btn2 = document.getElementById("btn2")
-    btn2.addEventListener('click', (event) =>{
-      event.preventDefault()
-      btn2.classList.add('reverse')
-      btn1.classList.remove('reverse')
-      document.getElementById('form_2').style.display = "block"
-      document.getElementById('form_1').style.display = "none"
-    })
-
+    var c_fullname = "{{ user_details['fullname'] }}"
+    var c_phone = "{{ user_details['mill_phone'] }}"
   </script>
-
+  <script src="{{ url_for('static',filename='js/send_msg.js') }}"></script>
+  <script src="{{ url_for('static',filename='js/btns.js') }}"></script>
 {% endblock %}

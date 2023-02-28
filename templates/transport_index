@@ -19,7 +19,7 @@
     
   }
   .ui-widget.ui-widget-content{
-    border: solid rgb(49,198,49) 2px;
+    border:none;
     border-radius: 10px;
   }
   .ui-state-default, .ui-widget-content .ui-state-default{
@@ -46,36 +46,12 @@
     background: white;
     color: rgb(49,198,49);
     }
-
-
-    .track_tables > table, td, th {
-      border:solid rgb(49,198,49) 2px;
-    }
-    .no-border td, .no-border th {
-      border: none;
-      padding: 5px;
-    }
-    table.track_tables {
-      width: 100%;
-      text-align: center;
-      font-size: larger;
-      border-collapse: collapse;
-    }
-    .track_tables > th, td {
-      padding:10px 5px;
-    }
-    .track_tables  tr>th{
-      background-color: rgb(49,198,49);
-      color: white;
-      font-size: larger;
-      border-right: solid white 2px;
-    }
  
 </style>
 {% endblock %}
 
 {% block user_details_table %}
-        <table class="no-border" style="border:none; text-align: left;" >
+        <table class="no-border" style="border:none; text-align: left; font-size: medium;" >
           <tr> <td><b>Name : </b></td>    <td colspan="3">{{ user_details['fullname'] }}</td></tr>
           <tr> <td><b>Phone : </b></td>   <td>{{ user_details['phone'] }}</td>  <td><b>Mandal : </b></td>  <td>{{ user_details['mandal'] }}</td> <td><b>Village : </b></td>  <td>{{ user_details['village'] }}</td> </tr>
           <tr> <td><b>Address : </b></td> <td colspan="5">{{ user_details['address'] }}</td></tr>
@@ -88,6 +64,7 @@
     <center>
       <button class="btn reverse" id="btn1">Booking Availbility</button>
       <button class="btn" id="btn2">Database of transportation</button>
+      <button class="btn" id="btn3">Message to RBK</button>
     </center>
   </div>
 
@@ -104,6 +81,8 @@
     <script src="{{ url_for('static',filename='js/jquery-ui.min.js') }}"></script>
     <script>
       var selectedDates = {{ user_details['available_dates'] }};
+      var fullname = "{{ user_details['fullname'] }}";
+      var phone = "{{ user_details['phone'] }}";
       $(function() {
         $("#calendar-container").datepicker({
           dateFormat: "yy-mm-dd",
@@ -169,8 +148,6 @@
         $("#calendar-container .ui-datepicker-trigger").click(); // trigger click on datepicker icon to show calendar
         $("#date-picker").hide(); // hide input field
         $("#submit-button").click( async () => {
-              var fullname = "{{ user_details['fullname'] }}"
-              var phone = "{{ user_details['phone'] }}"
                 let source = '/transport_update/available_dates'
                 let payload = { 
                     method: "POST",
@@ -199,7 +176,7 @@
   <div id="form_2" style="display: none;">
     <div  style="width: 90%; border:none; margin: 50px auto;">
       <center>
-          <table class="track_tables">
+          <table >
             <tr>
               <th>Track ID</th>
               <th>Customer Name</th>
@@ -229,30 +206,8 @@
                     <option value="Completed" {% if row['status']=='Completed' %} selected {% endif %}> Completed </option>
                   </select>
                   <button onclick="track_update(this,'{{ row['track_id']}}')" style="border:solid rgb(49,198,49) 2px; padding:5px; border-radius: 10px; background-color: rgb(49,198,49); color:white; cursor: pointer;" >Update</button>
-                  <script>
-                    const track_update = async (ele, track_id) => {
-                      var select_node = ele.previousElementSibling
-                      
-                        let source = '/transport_update/track_status'
-                        let payload = { 
-                            method: "POST",
-                            headers: {
-                                      'Content-Type': 'application/json'
-                                      },
-                            body: JSON.stringify({
-                                        "track_id": track_id,
-                                        "status": `${select_node.value}`
-                                    }) 
-                            }
-
-                        const response = await fetch(source,payload);
-                        const data = await response.json()
-                              if (data['status']=='ok'){
-                                alert(`Track ID : ${track_id} Status Uppdated.`)
-                                window.location.reload()
-                              }
-                      }
-                  </script>
+                  
+                  <script src="{{ url_for('static',filename='js/updates.js') }}"></script>
                 </td>
             </tr>
             {% endfor %}            
@@ -260,25 +215,24 @@
       </center>
     </div>
   </div>
+
+  <div id="form_3" style="display: none;">
+    <form style="border:none; width:70%" >
+      <center>
+          <fieldset><legend > Enter your Message </legend>
+            <textarea id="msg_content" class="" style="width:100%; height:200px; border:none;" onfocus="this.style.outline='none'"></textarea>
+          </fieldset> 
+          <br><br><br><br>
+          <button type="button" onclick="send_msg()" class="btn reverse"><b>SUBMIT</b></button><br><br>
+      </center>
+    </form>
+  </div>
+
+
   <script>
-
-  var btn1 = document.getElementById("btn1")
-  btn1.addEventListener('click', (event) =>{
-    event.preventDefault()
-    btn1.classList.add('reverse')
-    btn2.classList.remove('reverse')
-    document.getElementById('form_1').style.display = "block"
-    document.getElementById('form_2').style.display = "none"
-  })
-
-
-  var btn2 = document.getElementById("btn2")
-  btn2.addEventListener('click', (event) =>{
-    event.preventDefault()
-    btn2.classList.add('reverse')
-    btn1.classList.remove('reverse')
-    document.getElementById('form_2').style.display = "block"
-    document.getElementById('form_1').style.display = "none"
-  })
-</script>
+    var c_fullname = "{{ user_details['fullname'] }}"
+    var c_phone = "{{ user_details['phone'] }}"
+  </script>
+  <script src="{{ url_for('static',filename='js/send_msg.js') }}"></script>
+  <script src="{{ url_for('static',filename='js/btns.js') }}"></script>
 {% endblock %}

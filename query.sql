@@ -48,9 +48,6 @@ CREATE TABLE IF NOT EXISTS farmers (
 INSERT INTO farmers (_username, fullname, phone, bank_ac, aadhaar_no, address, mandal, village)
 VALUES('poorna', 'Poorna Venkata Sai L', '9876543210', '000987654321', '0987-6543-1234', '1-121, chilakalpudi, machilipatnam', 'bandar', 'chilakalapudi');
 
-INSERT INTO farmers (_username, fullname, phone, bank_ac, aadhaar_no, address, mandal, village)
-VALUES('venkat', 'Poorna Venkata Sai L', '9988776655', '000987654321', '0987-6543-1234', '1-121, chilakalpudi, machilipatnam', 'bandar', 'chilakalapudi');
-
 
 
 CREATE TABLE IF NOT EXISTS surveys (
@@ -65,11 +62,6 @@ CREATE TABLE IF NOT EXISTS surveys (
 INSERT INTO surveys (_username, phone, survey_no, land_capacity, land_passbook)
 VALUES('poorna','9876543210','123', '54321', '00098765');
 
-INSERT INTO surveys (_username, phone, survey_no, land_capacity, land_passbook)
-VALUES('poorna','9876543210','456', '55555', '00054321');
-
-INSERT INTO surveys (_username, phone, survey_no, land_capacity, land_passbook)
-VALUES('venkat','9988776655','789', '44444', '00076543');
 
 
 
@@ -80,15 +72,16 @@ CREATE TABLE IF NOT EXISTS crops_queue (
     cut_date TEXT,
     qc_date TEXT,
     sell_date TEXT,
-    bags TEXT,
+    bags_req TEXT,
+    vehicle_type_req TEXT,
+    pick_up_time TEXT,
+    pick_up_address TEXT,
     amount TEXT,
     status TEXT);
 
-INSERT INTO crops_queue (crop_id, survey_no, crop_type, cut_date, qc_date, sell_date, bags, amount, status)
-VALUES(9876, '456', 'paddy', '21-01-2023', '31-01-2023', '14-02-2023', 28, 19000, 'completed');
 
-INSERT INTO crops_queue (crop_id, survey_no, crop_type, cut_date, qc_date, bags, status)
-VALUES(9898, '123','rice', '21-01-2023', '31-01-2023', 30, 'processing'); 
+INSERT INTO crops_queue (crop_id, survey_no, crop_type, cut_date, qc_date, bags_req, vehicle_type_req)
+VALUES(9898, '123', 'paddy', '2023-01-15', '2023-02-28', 30, 'Tractor');
 
 
 

@@ -1,50 +1,10 @@
 {% extends 'base.html' %}
 
 {% block added_styles %}
-  <style>
-    fieldset{
-      width:500px;
-      border:solid rgb(49,198,49) 2px;
-      border-radius: 20px;
-      color:rgb(49,198,49);
-      font-size: large;
-      font-weight: bold;
-      margin: 10px;
-      height: fit-content;;
-    }
-    .flex_box_row_wrap{
-      display: flex;
-    }
-
-    table, td, th {
-      border:solid rgb(49,198,49) 2px;
-    }
-    .no-border td, .no-border th {
-      border: none;
-      padding: 5px;
-    }
-    table{
-      width: 100%;
-      text-align: center;
-      font-size: larger;
-      border-collapse: collapse;
-    }
-    th, td {
-      padding:10px 5px;
-    }
-    tr>th{
-      background-color: rgb(49,198,49);
-      color: white;
-      font-size: x-large;
-      border-right: solid white 2px;
-    }
- 
-  </style>
-
 {% endblock %}
 
 {% block user_details_table %}
-        <table class="no-border" style="border:none; text-align: left;" >
+        <table class="no-border" style="border:none; text-align: left; font-size: medium;" >
           <tr><td><b>Name : </b></td><td colspan="5">{{ user_details['fullname'] }}</td></tr>
           <tr><td><b>Phone : </b></td><td colspan="2">{{ user_details['phone'] }}</td><td><b>Aadhaar : </b></td> <td colspan="2">{{ user_details['aadhaar_no'] }}</td></tr>
           <tr><td><b>Mandal : </b></td> <td>{{ user_details['mandal'] }}</td><td><b>Village : </b></td><td>{{ user_details['village'] }}</td> <td><b>Bank A/C : </b></td><td>{{ user_details['bank_ac'] }}</td></tr>
@@ -59,12 +19,11 @@
         <button class="btn reverse" id="btn1">Crop Sales</button>
         <button class="btn" id="btn2">Crop sales details</button>
         <button class="btn" id="btn3">Message to RBK</button>
-        
       </center>
     </div>
 
     <div id="form_1">
-      <form style="width: 100%; border:none;">
+      <form style="width: 100%; border:none;" onsubmit="sell_crops(this)">
         <center class="flex_box_row_wrap">
             <fieldset><legend > Survey Number and Crop Type</legend>
               <select name="survey_no" class="formo">
@@ -72,28 +31,34 @@
                 <option value="{{ each['survey_no'] }}"> {{ each['survey_no'] }} </option>
                 {% endfor %}
               </select>
-              <input type="text"  autocomplete="off" class="formo" placeholder="Crop type" required> 
+              <input type="text" name="crop_type" autocomplete="off" class="formo" placeholder="Crop type" required> 
             </fieldset>
           
             <fieldset><legend > Crops info </legend>
-            <input type="text"  autocomplete="off" class="formo" placeholder="Crop cut date" required> 
-            <input type="text"  autocomplete="off" class="formo" placeholder="Crop quality check date" required>   
-            <input type="text"  autocomplete="off" class="formo" placeholder="Crop sale date" required> 
+            <input type="text" name="cut_date" autocomplete="off" class="formo" placeholder="Crop cut date" required> 
+            <input type="text" name="qc_date" autocomplete="off" class="formo" placeholder="Crop quality check date" required>   
+            <input type="text" name="sell_date" autocomplete="off" class="formo" placeholder="Crop sale date" required> 
             </fieldset>
 
             <fieldset><legend > Bags and Vehicles </legend>
-              <input type="number"  autocomplete="off" class="formo" placeholder="No: of bags required">  
-              <input type="number"  autocomplete="off" class="formo" placeholder="Vehical Type required" required>
+              <input type="number" name="bags_req" autocomplete="off" class="formo" placeholder="No: of bags required">  
+              <select name="vehicle_type_req" class="formo">
+                <option value="Tractor"> Tractor </option>
+                <option value="Lory"> Lory </option>
+                <option value="Truck"> Truck </option>
+                <option value="Van"> Van </option>
+              </select>
             </fieldset>
             
             <fieldset><legend > Pick-up Time and Address </legend>
-            <input type="text"  autocomplete="off" class="formo" placeholder="Time of sending crop" required>
-            <input type="address"  autocomplete="off" class="formo" placeholder="Crop pick up address" required>
-            
-          </fieldset>            
-        </center>
+              <input type="time" name="pick_up_time" autocomplete="off" class="formo" placeholder="Time of sending crop"  value="16:30"required>
+              <textarea  class="formo" name ="pick_up_address" placeholder="Crop pick up address" onfocus="this.style.outline='none'" style=" word-wrap: normal; height:50px; overflow: hidden">{{ user_details['address'] }}</textarea>
+            </fieldset>            
+          </center>
         <br><br><br><br>
-        <button type="button" class="btn reverse" style="width: 50%; margin:auto;"><b>SUBMIT</b></button><br><br>
+        <button type="submit" class="btn reverse" style="width: 50%; margin:auto;"><b>SUBMIT</b></button><br><br>
+
+        <script src="{{ url_for('static',filename='js/updates.js') }}"></script>
       </form>
     </div>
 
@@ -112,11 +77,17 @@
                 <th>Amount</th>
                 <th>Status</th>
               </tr>
-              {% for each in crops %}
+              {% for record in crops %}
               <tr>
-                {% for key,value in each.items() %}
-                  <td> {{ value }}</td>
-                {% endfor %}
+                <td> {{ record['crop_id'] }}</td>
+                <td> {{ record['survey_no'] }}</td>
+                <td> {{ record['crop_type'] }}</td>
+                <td> {{ record['cut_date'] }}</td>
+                <td> {{ record['qc_date'] }}</td>
+                <td> {{ record['sell_date'] }}</td>
+                <td> {{ record['bags_req'] }}</td>
+                <td> {{ record['amount'] }}</td>
+                <td> {{ record['status'] }}</td>
               </tr>
               {% endfor %}
             </table>
@@ -132,21 +103,21 @@
                 <th>Vehicle Type</th>
                 <th>Vehical No.</th>
                 <th>RiceMill</th>
+                <th>Pick Up Date</th>
+                <th>Pick Up Time</th>
+
               </tr>
+              {% for record in transports %}
               <tr>
-                <td>9898</td>
-                <td>300104</td>
-                <td>Tractor</td>
-                <td>AP 15 AZ 0001</td>
-                <td>ABC MILL MTM</td>
+                <td> {{ record['crop_id'] }}</td>
+                <td> {{ record['track_id'] }}</td>
+                <td> {{ record['vehicle_type'] }}</td>
+                <td> {{ record['vehicle_no'] }}</td>
+                <td> {{ record['to_'] }}</td>
+                <td> {{ record['date_booked'] }}</td>
+                <td> {{ record['time_slot'] }}</td>
               </tr>
-              <tr>
-                <td>9876</td>
-                <td>289979</td>
-                <td>Lorry</td>
-                <td>AP 12 XZ 1010</td>
-                <td>ABC MILL Pedana</td>
-              </tr>
+              {% endfor %}
               
             </table>
         </center>
@@ -169,76 +140,15 @@
             </fieldset> 
             <br><br><br><br>
             <button type="button" onclick="send_msg()" class="btn reverse"><b>SUBMIT</b></button><br><br>
-            <script>
-              var c_fullname = "{{ user_details['fullname'] }}"
-              var c_phone = "{{ user_details['phone'] }}"
-               send_msg = async ()=>{
-                let msg_survey_no = document.getElementById('msg_survey_no')
-                let msg_content = document.getElementById('msg_content')
-
-                let source = '/msg'
-                let payload = { 
-                    method: "POST",
-                    headers: {
-                              'Content-Type': 'application/json'
-                              },
-                    body: JSON.stringify({
-                                "c_fullname": `${c_fullname}`,
-                                "c_phone": `${c_phone}`,
-                                "survey_no": `${msg_survey_no.value}`, 
-                                "message": `${msg_content.value}` 
-                            }) 
-                    }
-
-                const response = await fetch(source,payload);
-                const data = await response.json()
-                      if (data['status']=='ok'){
-                        alert('Message sent to RBK.')
-                        msg_content.value = ''
-                      }
-              }
-            </script>
         </center>
       </form>
     </div>
-
-  <script>
-
-    var btn1 = document.getElementById("btn1")
-    btn1.addEventListener('click', (event) =>{
-      event.preventDefault()
-      btn1.classList.add('reverse')
-      btn2.classList.remove('reverse')
-      btn3.classList.remove('reverse')
-      document.getElementById('form_1').style.display = "block"
-      document.getElementById('form_2').style.display = "none"
-      document.getElementById('form_3').style.display = "none"
-    })
-
-
-    var btn2 = document.getElementById("btn2")
-    btn2.addEventListener('click', (event) =>{
-      event.preventDefault()
-      btn2.classList.add('reverse')
-      btn1.classList.remove('reverse')
-      btn3.classList.remove('reverse')
-      document.getElementById('form_2').style.display = "block"
-      document.getElementById('form_1').style.display = "none"
-      document.getElementById('form_3').style.display = "none"
-    })
-
-    var btn3 = document.getElementById("btn3")
-    btn3.addEventListener('click',(event) =>{
-      event.preventDefault()
-      btn3.classList.add('reverse')
-      btn2.classList.remove('reverse')
-      btn1.classList.remove('reverse')
-      document.getElementById('form_3').style.display="block"
-      document.getElementById('form_2').style.display="none"
-      document.getElementById('form_1').style.display="none"
-
-    })
-
-  </script>
+    
+    <script>
+              var c_fullname = "{{ user_details['fullname'] }}"
+              var c_phone = "{{ user_details['phone'] }}"
+    </script>
+    <script src="{{ url_for('static',filename='js/send_msg.js') }}"></script>
+    <script src="{{ url_for('static',filename='js/btns.js') }}"></script>
 
 {% endblock %}

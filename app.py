@@ -90,7 +90,16 @@ def signup():
 def contactus():
     return render_template('contactus')
 
-
+@app.route('/msg', methods=["POST","GET"])
+@login_required
+def send_msg():
+    if request.method=="POST":
+        data = request.get_json()
+        con = get_db()
+        con.execute(f'INSERT INTO messages (c_fullname, c_phone, survey_no, message) VALUES (?,?,?,?)',
+                    (data['c_fullname'], data['c_phone'], data['survey_no'], data['message']) )
+        con.commit()
+        return jsonify({'status':'ok'})
 
 
 
@@ -177,18 +186,6 @@ def mill_update(type_):
             return jsonify({'status':'ok'})
 
 
-@app.route('/msg', methods=["POST","GET"])
-@login_required
-def send_msg():
-    if request.method=="POST":
-        data = request.get_json()
-
-        con = get_db()
-        con.execute(f'INSERT INTO messages (c_fullname, c_phone, survey_no, message) VALUES (?,?,?,?)', (data['c_fullname'], data['c_phone'], data['survey_no'], data['message']) )
-        con.commit()
-
-        return jsonify({'status':'ok'})
-
 
 @app.route('/farmer_index')
 @login_required
@@ -206,6 +203,7 @@ def farmer_index():
         
         cursor = con.execute(f'SELECT * FROM surveys where phone="{ phone }"')
         surveys = [dict(each) for each in cursor.fetchall()]
+
         crops = []
         for each_survey in surveys:
             survey_no = each_survey['survey_no']
@@ -213,10 +211,35 @@ def farmer_index():
             for each in cursor.fetchall():
                 crops.append(dict(each))
         
-        return render_template('farmer_index', user_details=farmer_details, surveys=surveys, crops=crops)
+        transports = []
+        for each_crop in crops:
+            crop_id = each_crop['crop_id']
+            cursor = con.execute(f'SELECT * FROM transport_queue where crop_id="{ crop_id }"')
+            for each in cursor.fetchall():
+                transports.append(dict(each))
+        
+        return render_template('farmer_index', user_details=farmer_details, surveys=surveys, crops=crops, transports=transports)
     
     else:
         return '<h3>Error : You does not have access to this page.</h3>'
+
+@app.route('/crops_sell', methods=["POST"])
+def crops_sell():
+    active_user = session.get('active_user')
+    data = request.get_json()
+    con = get_db()
+
+    columns = ', '.join(data.keys())
+    placeholders = ', '.join('?' * len(data))
+    sql = 'INSERT INTO crops_queue ({}) VALUES ({})'.format(columns, placeholders)
+    values = [v for k,v in data.items()]
+
+    con.execute(sql, values)
+    con.commit()
+
+    return jsonify({'status':'ok'})
+
+
 
 @app.route('/transport_index')
 @login_required
@@ -240,9 +263,8 @@ def transport_index():
         return '<h3>Error : You does not have access to this page.</h3>'
 
 
-@app.route('/transport_update/<type_>', methods=["POST","GET"])
+@app.route('/transport_update/<type_>', methods=["POST"])
 def transport_update(type_):
-    if request.method=="POST":
         if type_=='available_dates':
             data = request.get_json()
 
