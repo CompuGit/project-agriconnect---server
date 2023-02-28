@@ -225,17 +225,14 @@
               <td>{{ row['vehicle_type'] }}</td>
               <td>{{ row['vehicle_no'] }}</td>
               <td><select style="border:solid rgb(49,198,49) 2px; padding:5px; border-radius: 10px; text-align: center; ">
-                    <option value="Pending" {% if row['status']=='pending' %} selected {% endif %}> Pending </option>
+                    <option value="Pending" {% if row['status']=='Pending' %} selected {% endif %}> Pending </option>
                     <option value="Completed" {% if row['status']=='Completed' %} selected {% endif %}> Completed </option>
                   </select>
-                  <button onclick="track_update(this)" style="border:solid rgb(49,198,49) 2px; padding:5px; border-radius: 10px; background-color: rgb(49,198,49); color:white; cursor: pointer;" >Update</button>
+                  <button onclick="track_update(this,'{{ row['track_id']}}')" style="border:solid rgb(49,198,49) 2px; padding:5px; border-radius: 10px; background-color: rgb(49,198,49); color:white; cursor: pointer;" >Update</button>
                   <script>
-                    const track_update = async (ele) => {
+                    const track_update = async (ele, track_id) => {
                       var select_node = ele.previousElementSibling
-                      var track_id = ele.parentNode.parentNode.childNodes[1].textContent
                       
-                      var fullname = "{{ user_details['fullname'] }}"
-                      var phone = "{{ user_details['phone'] }}"
                         let source = '/transport_update/track_status'
                         let payload = { 
                             method: "POST",

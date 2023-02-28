@@ -113,6 +113,70 @@ def transport_reg():
 
 
 
+
+@app.route('/rbk_index')
+def rbk_index():
+    return render_template('rbk_index', temp='')
+
+@app.route('/ricemill_index')
+def ricemill_index():
+    active_user = session.get('active_user')
+
+    if active_user['user_type']=='ricemill':
+        con = get_db()
+
+        mill_phone = active_user['phone']
+        cursor = con.execute(f'SELECT * FROM ricemill_owners where mill_phone="{ mill_phone }"')
+        mill_details = [dict(each) for each in cursor.fetchall()][0]
+
+        millname = mill_details['millname']
+        cursor = con.execute(f'SELECT * FROM ricemill_queue where millname="{ millname }"')
+        mill_queue = [dict(each) for each in cursor.fetchall()]
+
+        return render_template('ricemill_index', user_details=mill_details, queue=mill_queue)
+    else:
+        return '<h3>Error : You does not have access to this page.</h3>'
+
+
+
+@app.route('/mill_update/<type_>', methods=["POST","GET"])
+def mill_update(type_):
+    active_user = session.get('active_user')
+
+    if request.method=="POST":
+        if type_=='bags_status':
+            data = request.get_json()
+
+            con = get_db()
+
+            if data['status']=='dispatched':
+
+                phone = active_user['phone']
+                cursor = con.execute(f'SELECT storage_capacity, dispatched_bags FROM ricemill_owners WHERE mill_phone={phone}')
+                record = [dict(each) for each in cursor.fetchall()][0]
+                 
+                storage_capacity = record['storage_capacity'] - int(data['no_of_bags']) 
+                dispatched_bags = record['dispatched_bags'] + int(data['no_of_bags'])
+
+                con.execute(f'UPDATE ricemill_owners SET storage_capacity=?, dispatched_bags=?  WHERE mill_phone=?',
+                            ( storage_capacity, dispatched_bags , active_user['phone'] ) )
+
+            con.execute(f'UPDATE ricemill_queue SET bags_status=? WHERE id=?', ( data['status'], data['id']) )
+            con.commit()
+
+            return jsonify({'status':'ok'})
+        
+        if type_=='mill':
+            form = request.get_json()
+
+            con = get_db()
+            con.execute(f'UPDATE ricemill_owners SET storage_capacity=?, milling_capacity=?, dispatched_bags=?  WHERE mill_phone=?',
+                         ( form['storage_capacity'], form['milling_capacity'], form['dispatched_bags'], active_user['phone'] ) )
+            con.commit()
+
+            return jsonify({'status':'ok'})
+
+
 @app.route('/msg', methods=["POST","GET"])
 @login_required
 def send_msg():
@@ -126,52 +190,54 @@ def send_msg():
         return jsonify({'status':'ok'})
 
 
-
-
-@app.route('/rbk_index')
-def rbk_index():
-    return render_template('rbk_index', temp='')
-
-@app.route('/ricemill_index')
-def ricemill_index():
-    return render_template('ricemill_index', temp='')
-
 @app.route('/farmer_index')
+@login_required
 def farmer_index():
-    con = get_db()
-
     active_user = session.get('active_user')
-    phone = active_user['phone']
 
-    cursor = con.execute(f'SELECT * FROM farmers where phone="{ phone }"')
-    farmer_details = [dict(each) for each in cursor.fetchall()]
+    if active_user['user_type']=='farmer':
+        con = get_db()
 
+        phone = active_user['phone']
+
+        cursor = con.execute(f'SELECT * FROM farmers where phone="{ phone }"')
+        farmer_details = [dict(each) for each in cursor.fetchall()][0]
+
+        
+        cursor = con.execute(f'SELECT * FROM surveys where phone="{ phone }"')
+        surveys = [dict(each) for each in cursor.fetchall()]
+        crops = []
+        for each_survey in surveys:
+            survey_no = each_survey['survey_no']
+            cursor = con.execute(f'SELECT * FROM crops_queue where survey_no="{ survey_no }"')
+            for each in cursor.fetchall():
+                crops.append(dict(each))
+        
+        return render_template('farmer_index', user_details=farmer_details, surveys=surveys, crops=crops)
     
-    cursor = con.execute(f'SELECT * FROM surveys where phone="{ phone }"')
-    surveys = [dict(each) for each in cursor.fetchall()]
-    crops = []
-    for each_survey in surveys:
-        survey_no = each_survey['survey_no']
-        cursor = con.execute(f'SELECT * FROM crops_queue where survey_no="{ survey_no }"')
-        for each in cursor.fetchall():
-            crops.append(dict(each))
-    
-    return render_template('farmer_index', user_details=farmer_details[0], surveys=surveys, crops=crops)
+    else:
+        return '<h3>Error : You does not have access to this page.</h3>'
 
 @app.route('/transport_index')
+@login_required
 def transport_index():
-    con = get_db()
-
     active_user = session.get('active_user')
-    phone = active_user['phone']
 
-    cursor = con.execute(f'SELECT * FROM transport_owners where phone="{ phone }"')
-    transport_owner_details = [dict(each) for each in cursor.fetchall()]
+    if active_user['user_type']=='transport':
+        con = get_db()
+
+        phone = active_user['phone']
+
+        cursor = con.execute(f'SELECT * FROM transport_owners where phone="{ phone }"')
+        transport_owner_details = [dict(each) for each in cursor.fetchall()][0]
+        
+        cursor = con.execute(f'SELECT * FROM transport_queue where d_phone="{ phone }"')
+        transport_queue = [dict(each) for each in cursor.fetchall()]
+        
+        return render_template('transport_index', user_details=transport_owner_details, queue=transport_queue)
     
-    cursor = con.execute(f'SELECT * FROM transport_queue where d_phone="{ phone }"')
-    queue = [dict(each) for each in cursor.fetchall()]
-     
-    return render_template('transport_index', user_details=transport_owner_details[0], queue=queue)
+    else:
+        return '<h3>Error : You does not have access to this page.</h3>'
 
 
 @app.route('/transport_update/<type_>', methods=["POST","GET"])

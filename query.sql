@@ -125,4 +125,46 @@ CREATE TABLE IF NOT EXISTS transport_queue (
     status TEXT);
 
 INSERT INTO transport_queue (track_id, crop_id, c_fullname, c_phone, d_fullname, d_phone, date_booked, time_slot, from_, to_, vehicle_type, vehicle_no, status)
-VALUES(300104, 9898, 'Poorna Venkata Sai L', '9876543210', 'Jeswanth M', '9999888877', '2023-03-05', '5:30 PM', '1-121, chilakalpudi, machilipatnam', 'ABC Mill MTM', 'Tractor', 'AP 16 AZ 1234', 'completed' );
+VALUES(300104, 9898, 'Poorna Venkata Sai L', '9876543210', 'Jeswanth M', '9999888877', '2023-03-05', '5:30 PM', '1-121, chilakalpudi, machilipatnam', 'ABC Mill MTM', 'Tractor', 'AP 16 AZ 1234', 'pending' );
+
+
+
+
+CREATE TABLE IF NOT EXISTS ricemill_owners (
+    id INTEGER PRIMARY KEY,
+    fullname TEXT,
+    millname TEXT,
+    mill_phone TEXT,
+    address TEXT,
+    mandal TEXT,
+    village TEXT,
+    storage_capacity INTEGER,
+    milling_capacity INTEGER,
+    dispatched_bags INTEGER);
+
+
+INSERT INTO ricemill_owners (fullname, millname, mill_phone, address, mandal, village, storage_capacity, milling_capacity, dispatched_bags)
+VALUES( 'Tharun Narasimha M', 'ABC Rice Mill', '9999988888', '1-121, chilakalpudi, machilipatnam', 'bandar', 'chilakalapudi', 500, 500, 0);
+
+
+CREATE TABLE IF NOT EXISTS ricemill_queue (
+    id INTEGER PRIMARY KEY,
+    millname TEXT,
+    mill_phone TEXT,
+
+    crop_id INTEGER,
+    survey_no INTEGER,
+    crop_get_date TEXT,
+    c_fullname TEXT,
+    c_phone TEXT,
+    no_of_bags INTEGER,
+    bags_status TEXT,
+
+    track_id INTEGER,
+    t_fullname TEXT,
+    t_phone TEXT,
+    vehicle_type TEXT,
+    vehicle_no TEXT);
+
+INSERT INTO ricemill_queue (millname, mill_phone, crop_id, survey_no, crop_get_date, c_fullname, c_phone, no_of_bags, bags_status, track_id, t_fullname, t_phone, vehicle_type, vehicle_no)
+VALUES('ABC Rice Mill', '9999988888', 9898, 123, '2023-03-05',  'Poorna Venkata Sai L', '9876543210', 28, '', 300104, 'Jeswanth M', '9999888877', 'Tractor', 'AP 16 AZ 1234' );
