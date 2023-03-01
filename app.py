@@ -103,21 +103,99 @@ def send_msg():
 
 
 
+
+user_reg_mandal = ''
+user_reg_village = ''
+user_type = ''
+
 @app.route('/rbk_reg', methods=["GET","POST"])
 def rbk_reg():
     return render_template('rbk_reg', title='RBK Registration form')
 
 @app.route('/ricemill_reg', methods=["GET","POST"])
 def ricemill_reg():
-    return render_template('ricemill_reg', title='Ricemiller Registration form')
+    if request.method=="GET":
+        global user_reg_mandal
+        global user_reg_village
+        global user_type
+
+        user_reg_mandal = request.args.get('mandal')
+        user_reg_village = request.args.get('village')
+        user_type = 'ricemill'
+        
+        return render_template('ricemill_reg', reg_type="ricemill_reg")
+        
+    
+    if request.method=="POST":
+        data = request.get_json()
+
+        con = get_db()
+        con.execute('INSERT INTO users  (phone, password, user_type) VALUES (?,?,?)', 
+                    (data['mill_phone'], data['password'], user_type))
+        con.execute('INSERT INTO ricemill_owners (fullname, millname, mill_phone, storage_capacity, milling_capacity, dispatched_bags, address, mandal, village) VALUES (?,?,?,?,?,?,?,?,?)', 
+                    (data['fullname'], data['millname'], data['mill_phone'], data['storage_capacity'], data['milling_capacity'], 0, data['address'], user_reg_mandal, user_reg_village))
+        
+        con.commit()
+
+        return jsonify({'status':'ok'})
 
 @app.route('/farmer_reg', methods=["GET","POST"])
 def farmer_reg():
-    return render_template('farmer_reg', title='Farmer Registration form')
+    if request.method=="GET":
+        global user_reg_mandal
+        global user_reg_village
+        global user_type
+
+        user_reg_mandal = request.args.get('mandal')
+        user_reg_village = request.args.get('village')
+        user_type = 'farmer'
+        
+        return render_template('farmer_reg', reg_type="farmer_reg")
+        
+    
+    if request.method=="POST":
+        data = request.get_json()
+
+        con = get_db()
+        con.execute('INSERT INTO users  (phone, password, user_type) VALUES (?,?,?)', 
+                    (data['phone'], data['password'], user_type))
+        con.execute('INSERT INTO farmers  (fullname, phone, bank_ac, aadhaar_no, address, mandal, village) VALUES (?,?,?,?,?,?,?)', 
+                    (data['fullname'], data['phone'], data['bank_ac'], data['aadhaar_no'], data['address'], user_reg_mandal, user_reg_village))
+        con.execute('INSERT INTO surveys  (phone, survey_no, land_capacity, land_passbook) VALUES (?,?,?,?)', 
+                    (data['phone'], data['survey_no'], data['land_capacity'], data['land_passbook'],))
+        
+        con.commit()
+
+        return jsonify({'status':'ok'})
+
+
 
 @app.route('/transport_reg', methods=["GET","POST"])
 def transport_reg():
-    return render_template('transport_reg', title='Transport Registration form')
+    if request.method=="GET":
+        global user_reg_mandal
+        global user_reg_village
+        global user_type
+
+        user_reg_mandal = request.args.get('mandal')
+        user_reg_village = request.args.get('village')
+        user_type = 'transport'
+        
+        return render_template('transport_reg', reg_type="transport_reg")
+        
+    
+    if request.method=="POST":
+        data = request.get_json()
+
+        con = get_db()
+        con.execute('INSERT INTO users  (phone, password, user_type) VALUES (?,?,?)', 
+                    (data['phone'], data['password'], user_type))
+        con.execute('INSERT INTO transport_owners (fullname, phone, vehicle_type, vehicle_no, vehicle_rec, available_dates, address, mandal, village) VALUES (?,?,?,?,?,?,?,?,?)', 
+                    (data['fullname'], data['phone'], data['vehicle_type'], data['vehicle_no'], data['vehicle_rec'], '[]', data['address'], user_reg_mandal, user_reg_village))
+        
+        con.commit()
+
+        return jsonify({'status':'ok'})
 
 
 

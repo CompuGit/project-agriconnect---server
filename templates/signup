@@ -11,24 +11,35 @@
 
     <div id="bg_img"></div>
     <div class="container">
-        <form onsubmit="this.action = this['opening'].value; " >
+        <form onsubmit="navigateToSelectedUrl(event);" >
             <center>
-                <input type="text" autocomplete="off" class="formo" placeholder="Mandalam" required>
-                <input type="text" autocomplete="off" class="formo" placeholder="Area/village" required>
-                <input type="text"  autocomplete="off" class="formo" placeholder="Registered RBK" required>
+                <input type="text" autocomplete="off" name="mandal" class="formo" placeholder="Mandalam" required>
+                <input type="text" autocomplete="off" name="village" class="formo" placeholder="Area/village" required>
+                <input type="text" autocomplete="off" name="registered_rbk" class="formo" placeholder="Registered RBK" required>
                 
-                <select class="formo" name="opening">
-                    <option  style="color:grey">--Select--</option>
-                    <option value="/rbk_reg"  >RBK</option>
-                    <option value="/ricemill_reg"  >Rice Miller</option>
-                    <option value="/farmer_reg" >Farmer</option>
-                    <option value="/transport_reg" >Transport Owner</option>
+                <select class="formo" id="select-opening">
+                    <option style="color:grey">--Select--</option>
+                    <option value="/rbk_reg">RBK</option>
+                    <option value="/ricemill_reg">Rice Miller</option>
+                    <option value="/farmer_reg">Farmer</option>
+                    <option value="/transport_reg">Transport Owner</option>
                 </select>
-
+        
                 <br><br><br><br>
-                <button type="submit" class="bto" ><b>Next</b></button><br><br>
+                <button type="submit" class="bto"><b>Next</b></button><br><br>
             </center>
         </form>
+        
+        <script>
+        function navigateToSelectedUrl(event) {
+          event.preventDefault();
+          
+          const selectElement = document.getElementById("select-opening");
+          const selectedUrl = selectElement.value.split("?")[0]; 
+          window.location.href = selectedUrl + "?" + new URLSearchParams(new FormData(event.target)).toString();
+        }
+        </script>
+        
     </div>
 
 </body>
