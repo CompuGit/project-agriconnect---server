@@ -206,6 +206,7 @@ def rbk_index():
     return render_template('rbk_index', temp='')
 
 @app.route('/ricemill_index')
+@login_required
 def ricemill_index():
     active_user = session.get('active_user')
 
@@ -227,6 +228,7 @@ def ricemill_index():
 
 
 @app.route('/mill_update/<type_>', methods=["POST","GET"])
+@login_required
 def mill_update(type_):
     active_user = session.get('active_user')
 
@@ -302,6 +304,7 @@ def farmer_index():
         return '<h3>Error : You does not have access to this page.</h3>'
 
 @app.route('/crops_sell', methods=["POST"])
+@login_required
 def crops_sell():
     active_user = session.get('active_user')
     data = request.get_json()
@@ -342,6 +345,7 @@ def transport_index():
 
 
 @app.route('/transport_update/<type_>', methods=["POST"])
+@login_required
 def transport_update(type_):
         if type_=='available_dates':
             data = request.get_json()
