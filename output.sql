@@ -1,6 +1,8 @@
 BEGIN TRANSACTION;
 CREATE TABLE crops_queue (
     crop_id INTEGER PRIMARY KEY,
+    farmer_name TEXT,
+    mandal TEXT,
     survey_no TEXT,
     crop_type TEXT,
     cut_date TEXT,
@@ -12,8 +14,9 @@ CREATE TABLE crops_queue (
     pick_up_address TEXT,
     amount TEXT,
     status TEXT);
-INSERT INTO "crops_queue" VALUES(9898,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
-INSERT INTO "crops_queue" VALUES(9899,'987','Paddy','21-01-2023','25-02-2023','10-02-2023','50','Tractor','16:30','chilakalapudi, machilipatnam',NULL,'Processing');
+INSERT INTO "crops_queue" VALUES(9898,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+INSERT INTO "crops_queue" VALUES(9899,'Poorna V S L','Bandar','987','Paddy','21-01-2023','25-02-2023','10-02-2023','50','Tractor','16:30','1-121, Chilakalapudi, Machilipatnam',NULL,'Processing');
+INSERT INTO "crops_queue" VALUES(9900,'Poorna V S L','Bandar','789','Rice','21-01-2023','25-02-2023','10-02-2023','50','Tractor','16:30','1-121, Chilakalapudi, Machilipatnam',NULL,'Processing');
 CREATE TABLE farmers (
     id INTEGER PRIMARY KEY,
     fullname TEXT,
@@ -23,7 +26,7 @@ CREATE TABLE farmers (
     address TEXT,
     mandal TEXT,
     village TEXT);
-INSERT INTO "farmers" VALUES(1,'Poorna V S L','9876543210','0009876543211','123456789098','chilakalapudi, machilipatnam','bandar','chilakalapudi');
+INSERT INTO "farmers" VALUES(1,'Poorna V S L','9876543210','0009876543211','123456789098','1-121, Chilakalapudi, Machilipatnam','Bandar','Chilakalapudi');
 CREATE TABLE messages (
     id INTEGER PRIMARY KEY,
     c_fullname TEXT,
@@ -61,7 +64,8 @@ CREATE TABLE ricemill_owners (
     storage_capacity INTEGER,
     milling_capacity INTEGER,
     dispatched_bags INTEGER);
-INSERT INTO "ricemill_owners" VALUES(1,'Jeswanth','Vadlamannadu Ricemill','9998887776','reddipalem, vadlammandu','vadlamannadu','reddipalem',450,250,0);
+INSERT INTO "ricemill_owners" VALUES(1,'Jeswanth','Sri Venkateswara Ricemill','9998887776','12-32/212, Ramanaidupeta, Machilipatnam','Bandar','Ramanaidupeta',450,250,0);
+INSERT INTO "ricemill_owners" VALUES(2,'Harshadh','Vadlamannadu Ricemill','8765432109','reddipalem, vadlammandu','vadlamannadu','reddipalem',250,150,0);
 CREATE TABLE ricemill_queue (
     id INTEGER PRIMARY KEY,
     millname TEXT,
@@ -87,6 +91,7 @@ CREATE TABLE surveys (
     land_capacity TEXT,
     land_passbook TEXT);
 INSERT INTO "surveys" VALUES(1,'9876543210','987','50','0987654321');
+INSERT INTO "surveys" VALUES(2,'9876543210','789','80','0987654321');
 CREATE TABLE transport_owners (
     id INTEGER PRIMARY KEY,
     fullname TEXT,
@@ -98,7 +103,8 @@ CREATE TABLE transport_owners (
     vehicle_no TEXT,
     vehicle_rec TEXT,
     available_dates TEXT);
-INSERT INTO "transport_owners" VALUES(1,'Tharun Narasimha M','9988776655','bypass pedana, machilipatnam','pedana','bypass','Tractor','AP 16 AZ 4321','Not Yet Provided','["2023-03-09","2023-03-10","2023-03-11"]');
+INSERT INTO "transport_owners" VALUES(1,'Tharun Narasimha M','9988776655','453-45/3, Parasupeta, Machilipatnam','Bandar','Parasupeta','Tractor','AP 16 AZ 4321','Not Yet Provided','["2023-03-09","2023-03-10","2023-03-11"]');
+INSERT INTO "transport_owners" VALUES(2,'Kumar V','7654321098','bypass pedana, machilipatnam','pedana','bypass','Lory','AP 16 AY 4321','Documents Provided','["2023-03-09","2023-03-10","2023-03-11"]');
 CREATE TABLE transport_queue (
     track_id INTEGER PRIMARY KEY,
     crop_id INTEGER,
@@ -122,4 +128,14 @@ CREATE TABLE users (
 INSERT INTO "users" VALUES(1,'9876543210','123456','farmer');
 INSERT INTO "users" VALUES(2,'9988776655','123456','transport');
 INSERT INTO "users" VALUES(3,'9998887776','123456','ricemill');
+INSERT INTO "users" VALUES(4,'7654321098','123456','transport');
+INSERT INTO "users" VALUES(5,'8765432109','123456','ricemill');
+CREATE TABLE rbk_users (
+    rbk_id INTEGER PRIMARY KEY,
+    fullname TEXT,
+    phone TEXT,
+    password TEXT,
+    mandal TEXT,
+    village TEXT);
+INSERT INTO "rbk_users" VALUES(1001,'RBK Admin', '9999988888', '123456', 'Bandar', 'Chilakalapudi');
 COMMIT;

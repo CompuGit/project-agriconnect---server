@@ -3,7 +3,7 @@ send_msg = async ()=>{
  let msg_survey_no = document.getElementById('msg_survey_no') || 0
  let msg_content = document.getElementById('msg_content')
 
- let source = '/msg'
+ let source = '/send_msg'
  let payload = { 
      method: "POST",
      headers: {

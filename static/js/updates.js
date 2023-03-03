@@ -7,6 +7,8 @@ const sell_crops = async (form) => {
                     'Content-Type': 'application/json'
                     },
           body: JSON.stringify({
+                      "farmer_name": farmer_name,
+                      "mandal": farmer_mandal,
                       "survey_no": form['survey_no'].value,
                       "crop_type": form['crop_type'].value,
                       "cut_date": form['cut_date'].value,

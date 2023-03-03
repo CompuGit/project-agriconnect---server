@@ -140,6 +140,6 @@ fieldset{
     margin: 10px;
     height: fit-content;;
 }
-  .flex_box_row_wrap{
+.flex_box_row_wrap{
     display: flex;
 }

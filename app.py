@@ -4,6 +4,7 @@ from flask import Flask, g, request, session, redirect, url_for, jsonify, render
 
 app = Flask(__name__)
 app.secret_key = 'my_secret_key'
+app.config['SESSION_COOKIE_NAME'] = 'regular_app_session'
 app.config['DATABASE'] = './database.db'
 
 
@@ -64,9 +65,9 @@ def login():
                     session['active_user'] = db_user
                     return redirect('/')
             else:
-                return render_template('login', alert_script='<script>alert("Invalid login credentials. Retry again.")</script>')
+                return render_template('login', title='', alert_script='<script>alert("Invalid login credentials. Retry again.")</script>', page='/signup')
         else:
-            return render_template('login', alert_script='')
+            return render_template('login', title='', alert_script='', page='/signup')
     else:
         return redirect('/')
 
@@ -90,16 +91,15 @@ def signup():
 def contactus():
     return render_template('contactus')
 
-@app.route('/msg', methods=["POST","GET"])
+@app.route('/send_msg', methods=["POST"])
 @login_required
 def send_msg():
-    if request.method=="POST":
-        data = request.get_json()
-        con = get_db()
-        con.execute(f'INSERT INTO messages (c_fullname, c_phone, survey_no, message) VALUES (?,?,?,?)',
-                    (data['c_fullname'], data['c_phone'], data['survey_no'], data['message']) )
-        con.commit()
-        return jsonify({'status':'ok'})
+    data = request.get_json()
+    con = get_db()
+    con.execute(f'INSERT INTO messages (c_fullname, c_phone, survey_no, message) VALUES (?,?,?,?)',
+                (data['c_fullname'], data['c_phone'], data['survey_no'], data['message']) )
+    con.commit()
+    return jsonify({'status':'ok'})
 
 
 

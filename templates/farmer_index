@@ -57,7 +57,11 @@
           </center>
         <br><br><br><br>
         <button type="submit" class="btn reverse" style="width: 50%; margin:auto;"><b>SUBMIT</b></button><br><br>
-
+        
+        <script>
+          var farmer_name = "{{ user_details['fullname'] }}"
+          var farmer_mandal = "{{ user_details['mandal'] }}"
+        </script>
         <script src="{{ url_for('static',filename='js/updates.js') }}"></script>
       </form>
     </div>
