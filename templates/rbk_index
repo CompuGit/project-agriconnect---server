@@ -47,16 +47,16 @@ input[type="checkbox"]{
                 </tr>
                 {% for record in crops_queue %}
                 <tr>
-                  <td> <input type="radio" name="select_one row" id=""></td>
+                  <td> <input type="radio" name="select_one row" onchange="show_id('{{ record['crop_id'] }}')"></td>
                   <td> {{ record['crop_id'] }}</td>
                   <td> {{ record['farmer_name'] }}</td>
                   <td> {{ record['survey_no'] }}</td>
                   <td> {{ record['crop_type'] }}</td>
                   <td> {{ record['cut_date'] }}</td>
-                  <td> <input type="checkbox" checked > {{ record['qc_date'] }}</td>
+                  <td> <input type="checkbox" id="{{ record['crop_id'] }}_qc_check" {% if record['qc_check']=='True' %} checked disabled {% endif %}> {{ record['qc_date'] }}</td>
                   <td> {{ record['sell_date'] }}</td>
                   <td> {{ record['bags_req'] }}</td>
-                  <td style="padding:0px"> {% if not record['amount'] %} <input type="text" style="width: 100%; height: 100%; box-sizing: border-box; border: none; text-align: center;" > {% else %} {{ record['amount'] }} {% endif %}</td>
+                  <td style="padding:0px"> <input type="number" id="{{ record['crop_id'] }}_amount" style="width: 100%; height: 100%; box-sizing: border-box; border: none; text-align: center;" {% if not record['amount'] %} value=0 {% else %} value={{ record['amount'] }} {% endif %}> </td>
                   <td> {{ record['status'] }}</td>
                 </tr>
                 {% endfor %}
@@ -67,23 +67,28 @@ input[type="checkbox"]{
 
       <hr style="margin-top: 50px; border-color:rgb(49,198,49); box-shadow: none;">
 
-      <div style="width: 400px; margin-left: 0px; margin-top:50px;">
+      <div style="width: 400px; margin-left: 0px; margin-top:0px;">
         <div style="display: flex; flex-direction: column;">
+          <p id="id_area" style="font-weight: bolder; font-size: larger; text-align: center; "></p>
           <div>
-            <p style="text-align: center; color: rgb(49,198,49); font-size: large;">Assign Transport</p>
-            <select name="" id="" style="width: 100%; padding:5px 1px; border:solid rgb(49,198,49) 2px; border-radius: 10px;" onfocus="this.style.outline='none'">
-              <option>{{  format('4', '\u00A0<5') + format('Tractor','\u00A0<15') + format('AP 16 AZ 4321','\u00A0<15') + format('2023-03-05','\u00A0>11') }}</option>
+            <p style="text-align: center; color: rgb(49,198,49); font-size: large; font-weight: bolder;">Assign Transport</p>
+            <select name="" id="selected_transport" style="width: 100%; padding:5px 1px; border:solid rgb(49,198,49) 2px; border-radius: 10px;" onfocus="this.style.outline='none'">
+              {% for transport in transports %}
+              <option value="{{ transport['vehicle_no'] }};{{ transport['available_on'] }}">{{  format( transport['trips'] , '\u00A0<5') + format(transport['vehicle_type'] ,'\u00A0<15') + format(transport['vehicle_no'] ,'\u00A0<15') + format(transport['available_on'] ,'\u00A0>11') }}</option>
+              {% endfor %}
             </select>
           </div>
           <div>
-            <p style="text-align: center; color: rgb(49,198,49); font-size: large;">Assign Ricemill</p>
-            <select name="" id="" style="width: 100%; padding:5px 1px; border:solid rgb(49,198,49) 2px; border-radius: 10px;" onfocus="this.style.outline='none'">
-              <option>{{  format('ABC RiceMill','\u00A0<15') + format('chilakapudi','\u00A0^20') + format('bandar','\u00A0>15') }}</option>
+            <p style="text-align: center; color: rgb(49,198,49); font-size: large; font-weight: bolder;">Assign Ricemill</p>
+            <select name="" id="selected_mill" style="width: 100%; padding:5px 1px; border:solid rgb(49,198,49) 2px; border-radius: 10px;" onfocus="this.style.outline='none'">
+              {% for mill in ricemills %}
+              <option value="{{ mill['millname'] }};{{ mill['mandal'] }}">{{  format(mill['millname'] ,'\u00A0<25') + format(mill['village'],'\u00A0^20') + format(mill['mandal'],'\u00A0>15') }}</option>
+              {% endfor %}
             </select>
           </div>
         </div>
         <div style="margin-top: 30px;">
-          <button style="width: 100%;color:white; background-color: rgb(49,198,49); border:solid rgb(49,198,49) 2px; border-radius: 20px; cursor: pointer; padding:10px">Update</button>
+          <button onclick="update_record()" style="width: 100%;color:white; background-color: rgb(49,198,49); border:solid rgb(49,198,49) 2px; border-radius: 20px; cursor: pointer; padding:10px">Update</button>
         </div>
       </div>
     </div>
@@ -100,15 +105,25 @@ input[type="checkbox"]{
   </div>
 
   <div id="form_3" style="display: none;">
-    <form>
+    <form style="border:none; width:70%">
       <center>
           <table>
             <tr>
-              <th>Farmer Name</th>
-              <th>Farmer Phone</th>
+              <th>Name</th>
+              <th>Phone</th>
               <th>Survey No.</th>
-              <th>Message</th>
+              <th style="width:400px">Message</th>
+              <th>Status</th>
             </tr>
+            {% for row in messages %}
+            <tr>
+              <td>{{ row['c_fullname'] }}</td>
+              <td>{{ row['c_phone'] }}</td>
+              <td>{{ row['survey_no'] }}</td>
+              <td><pre style="text-align: left;">{{ row['message'] }}</pre></td>
+              <td>{{ row['status'] }}</th>
+            </tr>
+            {% endfor %}
           </table>
       </center>
     </form>
@@ -119,4 +134,47 @@ input[type="checkbox"]{
     var phone = "{{ user_details['phone'] }}"
   </script>
   <script src="{{ url_for('static',filename='js/btns.js') }}"></script>
+
+  <script>
+    var selected_crop_id = ''
+    const show_id = (crop_id)=>{
+        selected_crop_id = crop_id
+        id_area.textContent = 'Crop ID : ' + crop_id
+    }
+    const update_record = async ()=>{
+      qc_chekced = document.getElementById(selected_crop_id + '_qc_check')
+      crop_amount = document.getElementById(selected_crop_id + '_amount')
+
+      if(!qc_chekced){ alert('no record selected.')}
+      else{
+          if(!qc_chekced.checked){
+            alert('cannot assign transport or ricemill untill Quality Check is done.')
+          }
+          else{
+
+              let source = '/rbk_assign'
+              let payload = { 
+                  method: "POST",
+                  headers: {
+                            'Content-Type': 'application/json'
+                            },
+                  body: JSON.stringify({
+                              "crop_id": selected_crop_id,
+                              "crop_amount": crop_amount.value ,
+                              "selected_transport": selected_transport.value,
+                              'selected_mill' : selected_mill.value
+                          }) 
+                  }
+
+              const response = await fetch(source,payload);
+              const data = await response.json()
+                    if (data['status']=='ok'){
+                      alert(`Quality Check Updated. Transport and Ricemill assigned Successfully.`)
+                      window.location.reload()
+                    }
+              
+          }
+        }
+      }
+</script>
 {% endblock %}

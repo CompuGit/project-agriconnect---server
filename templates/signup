@@ -14,9 +14,18 @@
 
         <form onsubmit="navigateToSelectedUrl(event);" >
             <center>
-                <input type="text" autocomplete="off" name="mandal" class="formo" placeholder="Mandal" required>
-                <input type="text" autocomplete="off" name="village" class="formo" placeholder="Area/village" required>
-                <input type="text" autocomplete="off" name="registered_rbk" class="formo" placeholder="Registered RBK" required>
+                <select class="formo" name='mandal'>
+                    {% for mandal in mandals %}
+                    <option value="{{ mandal }}">{{ mandal }}</option>
+                    {% endfor %}
+                </select>
+                <select class="formo" name="village">
+                    {% for village in villages %}
+                    <option value="{{ village }}">{{ village }}</option>
+                    {% endfor %}
+                </select>
+                
+                <input type="text" name="registred_rbK_id" class="formo" placeholder="Registered RBK ID" style=" box-sizing: border-box;" >
                 
                 <select class="formo" id="select-opening">
                     <option style="color:grey">--Select--</option>

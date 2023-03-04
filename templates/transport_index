@@ -201,14 +201,7 @@
               <td>{{ row['to_'] }}</td>
               <td>{{ row['vehicle_type'] }}</td>
               <td>{{ row['vehicle_no'] }}</td>
-              <td><select style="border:solid rgb(49,198,49) 2px; padding:5px; border-radius: 10px; text-align: center; ">
-                    <option value="Pending" {% if row['status']=='Pending' %} selected {% endif %}> Pending </option>
-                    <option value="Completed" {% if row['status']=='Completed' %} selected {% endif %}> Completed </option>
-                  </select>
-                  <button onclick="track_update(this,'{{ row['track_id']}}')" style="border:solid rgb(49,198,49) 2px; padding:5px; border-radius: 10px; background-color: rgb(49,198,49); color:white; cursor: pointer;" >Update</button>
-                  
-                  <script src="{{ url_for('static',filename='js/updates.js') }}"></script>
-                </td>
+              <td>{{ row['status'] }}</td>
             </tr>
             {% endfor %}            
           </table>

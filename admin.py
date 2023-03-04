@@ -68,7 +68,6 @@ def logout():
 
 
 
-
 #signup route
 @app.route('/signup')
 def signup():
@@ -79,22 +78,19 @@ def signup():
 def contactus():
     return render_template('contactus')
 
-@app.route('/messages', methods=["GET"])
-#@login_required
-def messages():
-    con = get_db()
-    cursor = con.execute(f'SELECT * FROM messages' )
-    rows = [dict(each) for each in cursor.fetchall()]
-
-    return jsonify(rows)
-
-
 
 
 @app.route('/rbk_reg', methods=["POST","GET"])
 def rbk_reg():
     if request.method=='GET':
-        return render_template('rbk_reg', title='RBK Registration form', reg_type='rbk_reg')
+        con = get_db()
+        cursor = con.execute('SELECT DISTINCT mandal FROM places;')
+        mandals = [v for each in cursor.fetchall() for k,v in dict(each).items() ]
+
+        cursor = con.execute('SELECT village FROM places;')
+        villages = [v for each in cursor.fetchall() for k,v in dict(each).items() ]
+
+        return render_template('rbk_reg', title='RBK Registration form', reg_type='rbk_reg', mandals=mandals, villages=villages)
     if request.method=='POST':
         data = request.get_json()
         con = get_db()
@@ -111,11 +107,68 @@ def index():
     con = get_db()
     
     mandal = rbk_active_user['mandal']
-    cursor = con.execute(f'SELECT * FROM crops_queue WHERE  status="Processing"')
+    cursor = con.execute(f'SELECT * FROM crops_queue WHERE mandal="{mandal}" and status="Processing"')
     crops_queue = [dict(each) for each in cursor.fetchall()]
-    print(crops_queue)
+    
+    cursor = con.execute(f'SELECT trips, vehicle_type, vehicle_no, available_dates FROM transport_owners WHERE mandal="{mandal}"')
+    transport_owners = [dict(row) for row in cursor.fetchall()]
+    transports = []
+    for every_owner in transport_owners:
+        every_owner['available_dates'] = eval(every_owner['available_dates'])
 
-    return render_template('rbk_index', user_details=rbk_active_user, crops_queue=crops_queue)
+        for date_ in every_owner['available_dates']:
+            transports.append({'trips':str(every_owner['trips']), 'vehicle_type':every_owner['vehicle_type'], 'vehicle_no':every_owner['vehicle_no'], 'available_on':date_})
+
+    cursor = con.execute(f'SELECT millname, village, mandal FROM ricemill_owners')
+    ricemills = [dict(row) for row in cursor.fetchall()]
+
+    cursor = con.execute(f'SELECT * FROM messages')
+    messages = [dict(row) for row in cursor.fetchall()]
+
+    return render_template('rbk_index', user_details=rbk_active_user, crops_queue=crops_queue, transports=transports, ricemills=ricemills, messages=messages)
+
+
+@app.route('/rbk_assign', methods=["POST"])
+def rbk_assign():
+    data = request.get_json()
+    con = get_db()
+
+    crop_id=data['crop_id']
+    vehicle_no, pick_up_date =data['selected_transport'].split(';')
+    millname, mill_mandal = data['selected_mill'].split(';')
+
+    con.execute(f'UPDATE crops_queue SET qc_check="True", amount=?  WHERE crop_id=?', (data['crop_amount'], crop_id ) )
+
+    cursor = con.execute(f'SELECT * FROM crops_queue WHERE crop_id={crop_id}')
+    crop_queue = dict(cursor.fetchone())
+
+    survey_no = crop_queue['survey_no']
+    cursor = con.execute(f'SELECT * FROM farmers WHERE phone in (SELECT phone from surveys WHERE survey_no={survey_no})')
+    farmer = dict(cursor.fetchone())
+
+    cursor = con.execute(f'SELECT * FROM transport_owners WHERE vehicle_no="{vehicle_no}"')
+    transport_owner = dict(cursor.fetchone())
+    
+    con.execute('INSERT INTO transport_queue (crop_id, c_fullname, c_phone, d_fullname, d_phone, date_booked, time_slot, vehicle_type, Vehicle_no, status) VALUES (?,?,?,?,?,?,?,?,?,?)',
+                (crop_id, farmer['fullname'], farmer['phone'], transport_owner['fullname'], transport_owner['phone'], pick_up_date, crop_queue['pick_up_time'], transport_owner['vehicle_type'], vehicle_no, 'In-Progress'))
+
+
+    cursor = con.execute('SELECT MAX(track_id) FROM transport_queue')
+    track_id = dict(cursor.fetchone())['MAX(track_id)']
+
+    cursor = con.execute(f'SELECT * FROM ricemill_owners WHERE millname="{millname}" AND mandal="{mill_mandal}"')
+    ricemill = dict(cursor.fetchone())
+
+    con.execute('INSERT INTO ricemill_queue (millname, mill_phone, crop_id, survey_no, crop_get_date, c_fullname, c_phone, no_of_bags, track_id, t_fullname, t_phone, vehicle_type, Vehicle_no) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)',
+                (millname, ricemill['mill_phone'], crop_id, survey_no, pick_up_date, farmer['fullname'], farmer['phone'], crop_queue['bags_req'], track_id, transport_owner['fullname'], transport_owner['phone'], transport_owner['vehicle_type'], vehicle_no))
+    
+
+    con.execute('UPDATE transport_queue SET from_ = ?, to_ = ? WHERE track_id=?', (farmer['address'], ricemill['address'], track_id))
+    con.commit()
+
+    return jsonify({'status':'ok'})
+
+
 
 if __name__=="__main__":
     app.run(debug=True, port=5001)

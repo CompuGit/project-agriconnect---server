@@ -52,7 +52,7 @@ const track_update = async (ele, track_id) => {
             }
 }
 
-const bags_status = async (id, status) => {
+const bags_status = async (id, status, crop_id, track_id) => {
         
     let source = '/mill_update/bags_status'
     let payload = { 
@@ -63,7 +63,9 @@ const bags_status = async (id, status) => {
         body: JSON.stringify({
                     "id": id,
                     "no_of_bags":document.getElementById('d3f4').textContent,
-                    "status": status
+                    "status": status,
+                    "crop_id": crop_id,
+                    "track_id": track_id
                 }) 
         }
 

@@ -4,8 +4,16 @@
                     <h1 class="title"><u>RBK Registration Form</u></h1>
                     <input type="text" autocomplete="off" name="fullname" class="formo" placeholder="Fullname">
                     <input type="text" autocomplete="off" name="phone" class="formo" placeholder="Phone Number">  
-                    <input type="text" autocomplete="off" name="mandal" class="formo" placeholder="Mandal" required>
-                    <input type="text" autocomplete="off" name="village" class="formo" placeholder="Area/village" required>
+                    <select class="formo" name='mandal'>
+                        {% for mandal in mandals %}
+                        <option value="{{ mandal }}">{{ mandal }}</option>
+                        {% endfor %}
+                    </select>
+                    <select class="formo" name="village">
+                        {% for village in villages %}
+                        <option value="{{ village }}">{{ village }}</option>
+                        {% endfor %}
+                    </select>
                     
                     <input type="password" required name="password" id="passwd" autocomplete="off" class="formo" placeholder="Set new password">  
                     <input type="password" required name="cnf_password"  id="cnf_passwd" autocomplete="off" class="formo" placeholder="Confirm password" onkeyup="validate_password()">  

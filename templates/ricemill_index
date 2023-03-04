@@ -55,11 +55,11 @@
                 <td id="d3f4">{{ row['no_of_bags'] }}</td>
                 <td>
                   {% if not row['bags_status'] %}
-                  <button onclick="bags_status('{{row['id']}}', 'dispatched')" style="border:solid rgb(49,198,49) 2px; padding:5px; border-radius: 10px; background-color: rgb(49,198,49); color:white; cursor: pointer;" >
+                  <button onclick="bags_status('{{row['id']}}', 'dispatched', {{ row['crop_id'] }}, {{ row['track_id'] }} )" style="border:solid rgb(49,198,49) 2px; padding:5px; border-radius: 10px; background-color: rgb(49,198,49); color:white; cursor: pointer;" >
                     Dispatch</button>
                   {% elif 'dispatched' in row['bags_status'] and 'received' not in row['bags_status'] %}
                   <span style="border:solid rgb(49,198,49) 2px; padding:5px; border-radius: 10px; font-size:14px">Dispatched</span>
-                  <button onclick="bags_status('{{row['id']}}', 'dispatched received')" style="border:solid rgb(49,198,49) 2px; padding:5px; border-radius: 10px; background-color: rgb(49,198,49); color:white; cursor: pointer;" >
+                  <button onclick="bags_status('{{row['id']}}', 'dispatched received', {{ row['crop_id'] }}, {{ row['track_id'] }} )" style="border:solid rgb(49,198,49) 2px; padding:5px; border-radius: 10px; background-color: rgb(49,198,49); color:white; cursor: pointer;" >
                     Received</button>
                   {% elif 'dispatched' in row['bags_status'] and 'received' in row['bags_status'] %}
                   <span style="border:solid rgb(49,198,49) 2px; padding:5px; border-radius: 10px; font-size:14px">Dispatched</span>

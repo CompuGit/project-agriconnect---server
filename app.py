@@ -84,7 +84,15 @@ def logout():
 #signup route
 @app.route('/signup')
 def signup():
-    return render_template('signup')
+    con = get_db()
+
+    cursor = con.execute('SELECT DISTINCT mandal FROM places;')
+    mandals = [v for each in cursor.fetchall() for k,v in dict(each).items() ]
+
+    cursor = con.execute('SELECT village FROM places;')
+    villages = [v for each in cursor.fetchall() for k,v in dict(each).items() ]
+
+    return render_template('signup', mandals=mandals, villages=villages)
 
 #contact us route
 @app.route('/contactus')
@@ -96,8 +104,8 @@ def contactus():
 def send_msg():
     data = request.get_json()
     con = get_db()
-    con.execute(f'INSERT INTO messages (c_fullname, c_phone, survey_no, message) VALUES (?,?,?,?)',
-                (data['c_fullname'], data['c_phone'], data['survey_no'], data['message']) )
+    con.execute(f'INSERT INTO messages (c_fullname, c_phone, mandal, survey_no, message) VALUES (?,?,?,?,?)',
+                (data['c_fullname'], data['c_phone'], data['mandal'], data['survey_no'], data['message']) )
     con.commit()
     return jsonify({'status':'ok'})
 
@@ -108,9 +116,6 @@ user_reg_mandal = ''
 user_reg_village = ''
 user_type = ''
 
-@app.route('/rbk_reg', methods=["GET","POST"])
-def rbk_reg():
-    return render_template('rbk_reg', title='RBK Registration form')
 
 @app.route('/ricemill_reg', methods=["GET","POST"])
 def ricemill_reg():
@@ -235,7 +240,7 @@ def mill_update(type_):
     if request.method=="POST":
         if type_=='bags_status':
             data = request.get_json()
-
+            print(data)
             con = get_db()
 
             if data['status']=='dispatched':
@@ -249,6 +254,10 @@ def mill_update(type_):
 
                 con.execute(f'UPDATE ricemill_owners SET storage_capacity=?, dispatched_bags=?  WHERE mill_phone=?',
                             ( storage_capacity, dispatched_bags , active_user['phone'] ) )
+            
+            if data['status']=='dispatched received':
+                con.execute('UPDATE crops_queue SET status="Completed" WHERE crop_id={}'.format(data['crop_id']) )
+                con.execute('UPDATE transport_queue SET status="Completed" WHERE track_id={}'.format(data['track_id']))
 
             con.execute(f'UPDATE ricemill_queue SET bags_status=? WHERE id=?', ( data['status'], data['id']) )
             con.commit()
