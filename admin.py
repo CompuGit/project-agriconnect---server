@@ -197,8 +197,7 @@ def rbk_get_details(type_):
         for crop_id in crop_ids:
             cursor = con.execute(f'SELECT * FROM transport_queue WHERE crop_id={crop_id}')
             db_transport_queue.append(dict(cursor.fetchone()))
-            
-        print(db_transport_queue)
+        
         return jsonify(db_transport_queue)
 
     if type_ =='db_farmers_surveys':
