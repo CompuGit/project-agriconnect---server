@@ -95,13 +95,18 @@ input[type="checkbox"]{
   </div>
 
   <div id="form_2" style="display: none;">
-    <form>
-      <center>
-        <button class="btn" id="btn4">Farmer Database</button>
-        <button class="btn" id="btn5">Ricemiller Database</button>
-        <button class="btn" id="btn6">Transport Database</button>
-      </center>
-    </form>
+    <div style="margin-top:50px; display: flex; flex-direction: row;">
+      <div style="width:300px; border: solid grey 1px; display: flex; flex-direction: column; height:400px">
+          <button class="btn" id="btn4" onclick="rbk_get_details('db_crops')">Crops Sales</button>
+          <button class="btn" id="btn5" onclick="rbk_get_details('db_transport_queue')">Transport Queue</button>
+          <button class="btn" id="btn6" onclick="rbk_get_details('db_farmers_surveys')">Farmers DB</button>
+          <button class="btn" id="btn7" onclick="rbk_get_details('db_transport_owners')">Transport Users DB</button>
+          <button class="btn" id="btn8" onclick="rbk_get_details('db_ricemill_owners')">Ricemill Users DB</button>
+      </div>
+      <div style="width: 100%; border: solid grey 1px;">
+        <div id="rbk_db_content" style="width: 95%; margin: auto;"></div>
+      </div>
+    </div>
   </div>
 
   <div id="form_3" style="display: none;">
@@ -175,6 +180,94 @@ input[type="checkbox"]{
               
           }
         }
+      }
+
+      const rbk_get_details = async (type_) =>{
+              let source = '/rbk_get_details/'+type_
+
+              const response = await fetch(source);
+              const data = await response.json()
+
+              var table = document.createElement('table');
+              
+              if(type_=='db_crops'){
+
+                var headerRow = document.createElement('tr');
+                headerRow.innerHTML = `<th>Crop ID</th><th>Farmer Name</th><th>Survey No.</th><th>Crop Type</th><th>Cut Date</th><th>Quality Check Date</th><th>Sell Date</th>
+                <th>No. of BAGS</th><th>Amount</th><th>Status</th>`
+                table.appendChild(headerRow);
+
+                data.forEach(row => {
+                  var dataRowHtml = `<td>${row['crop_id']}</td><td>${row['farmer_name']}</td><td>${row['survey_no']}</td><td>${row['crop_type']}</td><td>${row['cut_date']}</td>
+                  <td>${row['qc_date']}</td><td>${row['sell_date']}</td><td>${row['bags_req']}</td><td>${row['amount']}</td><td>${row['status']}</td>`;
+                  var dataRow = document.createElement('tr');
+                  dataRow.innerHTML = dataRowHtml;
+                  table.appendChild(dataRow);
+                })
+              }
+              if(type_=='db_transport_queue'){
+
+                var headerRow = document.createElement('tr');
+                headerRow.innerHTML = `<th>Track ID</th><th>Crop ID</th><th>Farmer Name</th><th>Farmer Phone</th><th>Driver Name</th><th>Driver Phone</th><th>From</th><th>To</th>
+                <th>Vehicle Type</th><th>Vehicle No.</th><th>Status</th>`
+                table.appendChild(headerRow);
+
+                data.forEach(row => {
+                  var dataRowHtml = `<td>${row['track_id']}</td><td>${row['crop_id']}</td><td>${row['c_fullname']}</td><td>${row['c_phone']}</td><td>${row['d_fullname']}</td><td>${row['d_phone']}</td>
+                  <td>${row['from_']}</td><td>${row['to_']}</td><td>${row['vehicle_type']}</td><td>${row['vehicle_no']}</td><td>${row['status']}</td>`;
+                  var dataRow = document.createElement('tr');
+                  dataRow.innerHTML = dataRowHtml;
+                  table.appendChild(dataRow);
+                })
+              }
+              if(type_=='db_farmers_surveys'){
+
+                var headerRow = document.createElement('tr');
+                headerRow.innerHTML = `<th>Farmer Name</th><th>Phone</th><th>Address</th><th>Survey No.</th><th>Land Capacity</th><th>Field Passbook</th><th>Bank A/C No.</th><th>Aadhaar</th>
+                <th>Village</th><th>Mandal</th>`
+                table.appendChild(headerRow);
+
+                data.forEach(row => {
+                  var dataRowHtml = `<td>${row['fullname']}</td><td>${row['phone']}</td><td>${row['address']}</td><td>${row['survey_no']}</td><td>${row['land_capacity']}</td><td>${row['land_passbook']}</td>
+                  <td>${row['bank_ac']}</td><td>${row['aadhaar_no']}</td><td>${row['village']}</td><td>${row['mandal']}</td>`;
+                  var dataRow = document.createElement('tr');
+                  dataRow.innerHTML = dataRowHtml;
+                  table.appendChild(dataRow);
+                })
+              }
+              if(type_=='db_transport_owners'){
+
+                var headerRow = document.createElement('tr');
+                headerRow.innerHTML = `<th>Owner Name</th><th>Phone</th><th>Address</th><th>Vehicle Type</th><th>Vehicle No</th><th>No. of Trips</th><th> Vehicle Record</th><th>Village</th><th>Mandal</th>`
+                table.appendChild(headerRow);
+
+                data.forEach(row => {
+                  var dataRowHtml = `<td>${row['fullname']}</td><td>${row['phone']}</td><td>${row['address']}</td><td>${row['vehicle_type']}</td><td>${row['vehicle_no']}</td><td>${row['trips']}</td>
+                  <td>${row['vehicle_rec']}</td><td>${row['village']}</td><td>${row['mandal']}</td>`;
+                  var dataRow = document.createElement('tr');
+                  dataRow.innerHTML = dataRowHtml;
+                  table.appendChild(dataRow);
+                })
+              }
+              if(type_=='db_ricemill_owners'){
+
+                var headerRow = document.createElement('tr');
+                headerRow.innerHTML = `<th>Owner Name</th><th>Mill Name</th><th>Mill Phone</th><th>Address</th><th>Storage Capacity</th><th>Milling Capacity</th><th>Dispatched Bags</th><th>Village</th><th>Mandal</th>`
+                table.appendChild(headerRow);
+
+                data.forEach(row => {
+                  var dataRowHtml = `<td>${row['fullname']}</td><td>${row['millname']}</td><td>${row['mill_phone']}</td><td>${row['address']}</td><td>${row['storage_capacity']}</td><td>${row['milling_capacity']}</td>
+                  <td>${row['dispatched_bags']}</td><td>${row['village']}</td><td>${row['mandal']}</td>`;
+                  var dataRow = document.createElement('tr');
+                  dataRow.innerHTML = dataRowHtml;
+                  table.appendChild(dataRow);
+                })
+              }
+
+
+              document.getElementById('rbk_db_content').innerHTML = ''
+              document.getElementById('rbk_db_content').appendChild(table)
+
       }
 </script>
 {% endblock %}

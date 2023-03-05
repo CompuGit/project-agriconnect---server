@@ -125,6 +125,7 @@ def index():
     cursor = con.execute(f'SELECT * FROM messages')
     messages = [dict(row) for row in cursor.fetchall()]
 
+
     return render_template('rbk_index', user_details=rbk_active_user, crops_queue=crops_queue, transports=transports, ricemills=ricemills, messages=messages)
 
 
@@ -168,6 +169,66 @@ def rbk_assign():
 
     return jsonify({'status':'ok'})
 
+
+@app.route('/rbk_get_details/<type_>')
+def rbk_get_details(type_):
+    rbk_active_user = session.get('rbk_active_user')
+    mandal = rbk_active_user['mandal']
+
+    con = get_db()
+
+    crop_ids = []
+
+    if type_ == 'db_crops':
+
+        cursor = con.execute(f'SELECT * FROM crops_queue WHERE mandal="{mandal}" and status="Completed"')
+        db_crops = [dict(each) for each in cursor.fetchall()]
+
+        return jsonify(db_crops)
+
+    if type_ == 'db_transport_queue':
+
+        cursor = con.execute(f'SELECT * FROM crops_queue WHERE mandal="{mandal}" and status="Completed"')
+        db_crops = [dict(each) for each in cursor.fetchall()]
+        crop_ids = [row['crop_id'] for row in db_crops ]
+        
+        db_transport_queue = []
+
+        for crop_id in crop_ids:
+            cursor = con.execute(f'SELECT * FROM transport_queue WHERE crop_id={crop_id}')
+            db_transport_queue.append(dict(cursor.fetchone()))
+            
+        print(db_transport_queue)
+        return jsonify(db_transport_queue)
+
+    if type_ =='db_farmers_surveys':
+
+        cursor = con.execute(f'SELECT * FROM farmers WHERE mandal="{mandal}" ')
+        db_farmers = [dict(each) for each in cursor.fetchall()]
+
+        for every in db_farmers:
+            user_phone = every['phone']
+            cursor = con.execute(f'SELECT * FROM surveys WHERE phone="{user_phone}" ')
+            db_surveys = [dict(each) for each in cursor.fetchall()]
+            for each in db_surveys:
+                every.update(each)
+        
+        return jsonify(db_farmers)
+
+    if type_ == 'db_transport_owners':
+
+        cursor = con.execute(f'SELECT * FROM transport_owners WHERE mandal="{mandal}" ')
+        db_transport_owners = [dict(each) for each in cursor.fetchall()]
+
+        return jsonify(db_transport_owners)
+    
+    if type_ == 'db_ricemill_owners':
+
+        cursor = con.execute(f'SELECT * FROM ricemill_owners')
+        db_ricemill_owners = [dict(each) for each in cursor.fetchall()]
+
+        print(db_ricemill_owners)
+        return jsonify(db_ricemill_owners)
 
 
 if __name__=="__main__":
