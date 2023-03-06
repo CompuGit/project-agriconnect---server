@@ -13,7 +13,8 @@ send_msg = async ()=>{
                  "c_fullname": `${c_fullname}`,
                  "c_phone": `${c_phone}`,
                  "survey_no": `${msg_survey_no.value}`, 
-                 "message": `${msg_content.value}` 
+                 "message": `${msg_content.value}` ,
+                 "assigned_rbk": rbk_id
              }) 
      }
 

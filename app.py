@@ -1,13 +1,18 @@
+#importing require libraries
 import sqlite3
 from functools import wraps
 from flask import Flask, g, request, session, redirect, url_for, jsonify, render_template
 
+#configuring the flask app and jinja env
 app = Flask(__name__)
 app.secret_key = 'my_secret_key'
 app.config['SESSION_COOKIE_NAME'] = 'regular_app_session'
 app.config['DATABASE'] = './database.db'
 
+app.jinja_env.globals.update(format=format)
 
+
+#function to create a thread connection to db
 def get_db():
     if 'db' not in g:
         g.db = sqlite3.connect(app.config['DATABASE'])
@@ -20,6 +25,7 @@ def close_db(error):
         g.db.close()
 
 
+#app's login_required decorator
 def login_required(func):
     @wraps(func)
     def wraper(*args,**kwargs):
@@ -28,6 +34,7 @@ def login_required(func):
         else:
             return redirect('/login')
     return wraper
+
 
 
 #default route
@@ -99,33 +106,42 @@ def signup():
 def contactus():
     return render_template('contactus')
 
+
+
+
+#send msg endpoint for any user to send message to respective RBK
 @app.route('/send_msg', methods=["POST"])
 @login_required
 def send_msg():
     data = request.get_json()
     con = get_db()
-    con.execute(f'INSERT INTO messages (c_fullname, c_phone, mandal, survey_no, message) VALUES (?,?,?,?,?)',
-                (data['c_fullname'], data['c_phone'], data['mandal'], data['survey_no'], data['message']) )
+    con.execute(f'INSERT INTO messages (c_fullname, c_phone, survey_no, message, assigned_rbk, status) VALUES (?,?,?,?,?,?)',
+                (data['c_fullname'], data['c_phone'], data['survey_no'], data['message'], data['assigned_rbk'], 'in-progress') )
     con.commit()
     return jsonify({'status':'ok'})
 
 
 
-
+#some global that require for registration for user
 user_reg_mandal = ''
 user_reg_village = ''
+user_rbk_id = ''
 user_type = ''
 
 
+
+#Ricemill user registration endpoint returns {'status':'ok'} if all good
 @app.route('/ricemill_reg', methods=["GET","POST"])
 def ricemill_reg():
     if request.method=="GET":
         global user_reg_mandal
         global user_reg_village
+        global user_rbk_id
         global user_type
 
         user_reg_mandal = request.args.get('mandal')
         user_reg_village = request.args.get('village')
+        user_rbk_id = request.args.get('registred_rbK_id')
         user_type = 'ricemill'
         
         return render_template('ricemill_reg', reg_type="ricemill_reg")
@@ -137,22 +153,27 @@ def ricemill_reg():
         con = get_db()
         con.execute('INSERT INTO users  (phone, password, user_type) VALUES (?,?,?)', 
                     (data['mill_phone'], data['password'], user_type))
-        con.execute('INSERT INTO ricemill_owners (fullname, millname, mill_phone, storage_capacity, milling_capacity, dispatched_bags, address, mandal, village) VALUES (?,?,?,?,?,?,?,?,?)', 
-                    (data['fullname'], data['millname'], data['mill_phone'], data['storage_capacity'], data['milling_capacity'], 0, data['address'], user_reg_mandal, user_reg_village))
+        con.execute('INSERT INTO ricemill_owners (rbk_id, fullname, millname, mill_phone, storage_capacity, milling_capacity, dispatched_bags, address, mandal, village) VALUES (?,?,?,?,?,?,?,?,?,?)', 
+                    ( user_rbk_id, data['fullname'], data['millname'], data['mill_phone'], data['storage_capacity'], data['milling_capacity'], 0, data['address'], user_reg_mandal, user_reg_village))
         
         con.commit()
 
         return jsonify({'status':'ok'})
 
+
+
+#farmer user registration endpoint returns {'status':'ok'} if all good
 @app.route('/farmer_reg', methods=["GET","POST"])
 def farmer_reg():
     if request.method=="GET":
         global user_reg_mandal
         global user_reg_village
+        global user_rbk_id
         global user_type
 
         user_reg_mandal = request.args.get('mandal')
         user_reg_village = request.args.get('village')
+        user_rbk_id = request.args.get('registred_rbK_id')
         user_type = 'farmer'
         
         return render_template('farmer_reg', reg_type="farmer_reg")
@@ -164,8 +185,8 @@ def farmer_reg():
         con = get_db()
         con.execute('INSERT INTO users  (phone, password, user_type) VALUES (?,?,?)', 
                     (data['phone'], data['password'], user_type))
-        con.execute('INSERT INTO farmers  (fullname, phone, bank_ac, aadhaar_no, address, mandal, village) VALUES (?,?,?,?,?,?,?)', 
-                    (data['fullname'], data['phone'], data['bank_ac'], data['aadhaar_no'], data['address'], user_reg_mandal, user_reg_village))
+        con.execute('INSERT INTO farmers  (rbk_id, fullname, phone, bank_ac, aadhaar_no, address, mandal, village) VALUES (?,?,?,?,?,?,?,?)', 
+                    ( user_rbk_id, data['fullname'], data['phone'], data['bank_ac'], data['aadhaar_no'], data['address'], user_reg_mandal, user_reg_village))
         con.execute('INSERT INTO surveys  (phone, survey_no, land_capacity, land_passbook) VALUES (?,?,?,?)', 
                     (data['phone'], data['survey_no'], data['land_capacity'], data['land_passbook'],))
         
@@ -175,15 +196,19 @@ def farmer_reg():
 
 
 
+
+#Transport user registration endpoint returns {'status':'ok'} if all good
 @app.route('/transport_reg', methods=["GET","POST"])
 def transport_reg():
     if request.method=="GET":
         global user_reg_mandal
         global user_reg_village
+        global user_rbk_id
         global user_type
 
         user_reg_mandal = request.args.get('mandal')
         user_reg_village = request.args.get('village')
+        user_rbk_id = request.args.get('registred_rbK_id')
         user_type = 'transport'
         
         return render_template('transport_reg', reg_type="transport_reg")
@@ -195,8 +220,8 @@ def transport_reg():
         con = get_db()
         con.execute('INSERT INTO users  (phone, password, user_type) VALUES (?,?,?)', 
                     (data['phone'], data['password'], user_type))
-        con.execute('INSERT INTO transport_owners (fullname, phone, vehicle_type, vehicle_no, vehicle_rec, available_dates, address, mandal, village) VALUES (?,?,?,?,?,?,?,?,?)', 
-                    (data['fullname'], data['phone'], data['vehicle_type'], data['vehicle_no'], data['vehicle_rec'], '[]', data['address'], user_reg_mandal, user_reg_village))
+        con.execute('INSERT INTO transport_owners (rbk_id, fullname, phone, trips, vehicle_type, vehicle_no, vehicle_rec, available_dates, address, mandal, village) VALUES (?,?,?,?,?,?,?,?,?,?,?)', 
+                    (user_rbk_id, data['fullname'], data['phone'], 0, data['vehicle_type'], data['vehicle_no'], data['vehicle_rec'], '[]', data['address'], user_reg_mandal, user_reg_village))
         
         con.commit()
 
@@ -204,12 +229,7 @@ def transport_reg():
 
 
 
-
-
-@app.route('/rbk_index')
-def rbk_index():
-    return render_template('rbk_index', temp='')
-
+#as per the user logged in session the ricemill user index page along with its defaults
 @app.route('/ricemill_index')
 @login_required
 def ricemill_index():
@@ -232,6 +252,7 @@ def ricemill_index():
 
 
 
+#update mill bags_status and self details and returns {'status':'ok'} if all good
 @app.route('/mill_update/<type_>', methods=["POST","GET"])
 @login_required
 def mill_update(type_):
@@ -259,6 +280,17 @@ def mill_update(type_):
                 con.execute('UPDATE crops_queue SET status="Completed" WHERE crop_id={}'.format(data['crop_id']) )
                 con.execute('UPDATE transport_queue SET status="Completed" WHERE track_id={}'.format(data['track_id']))
 
+                cursor = con.execute('SELECT vehicle_no FROM transport_queue WHERE track_id={}'.format(data['track_id']))
+                vehicle_no = dict(cursor.fetchone())['vehicle_no']
+
+                cursor = con.execute(f'SELECT COUNT(vehicle_no) FROM transport_queue WHERE vehicle_no="{vehicle_no}" AND status="Completed"')
+                ct = dict(cursor.fetchone())['COUNT(vehicle_no)']
+
+                cursor = con.execute(f'SELECT COUNT(vehicle_no) FROM transport_queue WHERE vehicle_no="{vehicle_no}"')
+                tt = dict(cursor.fetchone())['COUNT(vehicle_no)']
+
+                con.execute('UPDATE transport_owners SET trips= ? WHERE vehicle_no= ?',( f'{ct}/{tt}', vehicle_no ))
+
             con.execute(f'UPDATE ricemill_queue SET bags_status=? WHERE id=?', ( data['status'], data['id']) )
             con.commit()
 
@@ -276,6 +308,8 @@ def mill_update(type_):
 
 
 
+
+#as per the user logged in session the farmer user index page along with its defaults
 @app.route('/farmer_index')
 @login_required
 def farmer_index():
@@ -312,6 +346,8 @@ def farmer_index():
     else:
         return '<h3>Error : You does not have access to this page.</h3>'
 
+
+#update crops queue and returns {'status':'ok'} if all good
 @app.route('/crops_sell', methods=["POST"])
 @login_required
 def crops_sell():
@@ -331,6 +367,8 @@ def crops_sell():
 
 
 
+
+#as per the user logged in session the transport user index page along with its defaults
 @app.route('/transport_index')
 @login_required
 def transport_index():
@@ -353,6 +391,8 @@ def transport_index():
         return '<h3>Error : You does not have access to this page.</h3>'
 
 
+
+#update transport user avaiable dates and returns {'status':'ok'} if all good
 @app.route('/transport_update/<type_>', methods=["POST"])
 @login_required
 def transport_update(type_):
@@ -364,16 +404,9 @@ def transport_update(type_):
             con.commit()
 
             return jsonify({'status':'ok'})
-        if type_=='track_status':
-            data = request.get_json()
-            print(data)
-
-            con = get_db()
-            con.execute(f'UPDATE transport_queue SET status=? WHERE track_id=?', ( data['status'], data['track_id']) )
-            con.commit()
-
-            return jsonify({'status':'ok'})
 
 
+
+#main execution
 if __name__=="__main__":
     app.run(debug=True)

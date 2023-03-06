@@ -55,7 +55,7 @@ input[type="checkbox"]{
                   <td> {{ record['cut_date'] }}</td>
                   <td> <input type="checkbox" id="{{ record['crop_id'] }}_qc_check" {% if record['qc_check']=='True' %} checked disabled {% endif %}> {{ record['qc_date'] }}</td>
                   <td> {{ record['sell_date'] }}</td>
-                  <td> {{ record['bags_req'] }}</td>
+                  <td style="padding:0px"> <input type="number" id="{{ record['crop_id'] }}_bags_req" style="width: 100%; height: 100%; box-sizing: border-box; border: none; text-align: center;" {% if not record['bags_req'] %} value=0 {% else %} value={{ record['bags_req'] }} {% endif %}> </td>
                   <td style="padding:0px"> <input type="number" id="{{ record['crop_id'] }}_amount" style="width: 100%; height: 100%; box-sizing: border-box; border: none; text-align: center;" {% if not record['amount'] %} value=0 {% else %} value={{ record['amount'] }} {% endif %}> </td>
                   <td> {{ record['status'] }}</td>
                 </tr>
@@ -88,7 +88,7 @@ input[type="checkbox"]{
           </div>
         </div>
         <div style="margin-top: 30px;">
-          <button onclick="update_record()" style="width: 100%;color:white; background-color: rgb(49,198,49); border:solid rgb(49,198,49) 2px; border-radius: 20px; cursor: pointer; padding:10px">Update</button>
+          <button id="rbk_btn" style="width: 100%;color:white; background-color: rgb(49,198,49); border:solid rgb(49,198,49) 2px; border-radius: 20px; cursor: pointer; padding:10px">Update</button>
         </div>
       </div>
     </div>
@@ -137,6 +137,7 @@ input[type="checkbox"]{
   <script>
     var fullname = "{{ user_details['fullname'] }}"
     var phone = "{{ user_details['phone'] }}"
+    var rbk_id = "{{ user_details['rbk_id'] }}"
   </script>
   <script src="{{ url_for('static',filename='js/btns.js') }}"></script>
 
@@ -145,10 +146,20 @@ input[type="checkbox"]{
     const show_id = (crop_id)=>{
         selected_crop_id = crop_id
         id_area.textContent = 'Crop ID : ' + crop_id
+        let qc_check = document.getElementById(selected_crop_id + '_qc_check')
+        if(qc_check.checked){
+            rbk_btn.addEventListener('click', ()=>{entry_record('update')})
+        }
+        else{
+            rbk_btn.addEventListener('click', ()=>{entry_record('new')})
+        }
+
     }
-    const update_record = async ()=>{
+    const entry_record = async (type_)=>{
       qc_chekced = document.getElementById(selected_crop_id + '_qc_check')
       crop_amount = document.getElementById(selected_crop_id + '_amount')
+      crop_bags = document.getElementById(selected_crop_id + '_bags_req')
+
 
       if(!qc_chekced){ alert('no record selected.')}
       else{
@@ -164,10 +175,13 @@ input[type="checkbox"]{
                             'Content-Type': 'application/json'
                             },
                   body: JSON.stringify({
+                              "rbk_id": rbk_id,
                               "crop_id": selected_crop_id,
                               "crop_amount": crop_amount.value ,
+                              "crop_bags": crop_bags.value ,
                               "selected_transport": selected_transport.value,
-                              'selected_mill' : selected_mill.value
+                              'selected_mill' : selected_mill.value,
+                              "type_" : type_
                           }) 
                   }
 

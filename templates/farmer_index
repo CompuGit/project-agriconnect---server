@@ -5,7 +5,7 @@
 
 {% block user_details_table %}
         <table class="no-border" style="border:none; text-align: left; font-size: medium;" >
-          <tr><td><b>Name : </b></td><td colspan="5">{{ user_details['fullname'] }}</td></tr>
+          <tr><td><b>Name : </b></td><td colspan="3">{{ user_details['fullname'] }}</td> <td><b>RBK ID : </b></td><td>{{ user_details['rbk_id'] }}</td></tr>
           <tr><td><b>Phone : </b></td><td colspan="2">{{ user_details['phone'] }}</td><td><b>Aadhaar : </b></td> <td colspan="2">{{ user_details['aadhaar_no'] }}</td></tr>
           <tr><td><b>Mandal : </b></td> <td>{{ user_details['mandal'] }}</td><td><b>Village : </b></td><td>{{ user_details['village'] }}</td> <td><b>Bank A/C : </b></td><td>{{ user_details['bank_ac'] }}</td></tr>
           <tr><td><b>Address : </b></td> <td colspan="5">{{ user_details['address'] }}</td></tr>
@@ -61,6 +61,7 @@
         <script>
           var farmer_name = "{{ user_details['fullname'] }}"
           var farmer_mandal = "{{ user_details['mandal'] }}"
+          var rbk_id = "{{ user_details['rbk_id'] }}"
         </script>
         <script src="{{ url_for('static',filename='js/updates.js') }}"></script>
       </form>
