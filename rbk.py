@@ -2,6 +2,7 @@
 import sqlite3
 from functools import wraps
 from flask import Flask, g, request, session, redirect, url_for, jsonify, render_template
+import hashlib
 
 #configuring the flask app and jinja env
 app = Flask(__name__)
@@ -44,14 +45,14 @@ def login():
         if request.method=='POST':
             form = request.form
             form_phone = form['username']
-            form_password = form['password']
+            form_password = hashlib.sha256(bytes(form['password'],'utf-8') ).hexdigest()
 
             con = get_db()
             cursor = con.execute(f'SELECT * FROM rbk_users WHERE phone={form_phone}')       #getting cred info from rbk_users table
             db_user = dict(cursor.fetchone())
 
 
-            if form_phone == db_user['phone'] and form_password == db_user['password']:
+            if form_password == db_user['password']:
                     session['rbk_logged_in'] = True
                     del db_user['password']
                     session['rbk_active_user'] = db_user
@@ -72,17 +73,29 @@ def logout():
     return redirect('/login')
 
 
+#for selecting mandals and villages in registration
+@app.route('/get_place_info/<type_>')
+def get_places(type_):
+    con = get_db()
+    if type_=='mandal':
+        mandal = request.args.get('item_')
+        cursor = con.execute(f'SELECT DISTINCT village FROM places WHERE mandal="{mandal}"')
+        villages = [v for each in cursor.fetchall() for k,v in dict(each).items() ]
+
+        return jsonify(villages)
+    
+    if type_ =='village':
+        village = request.args.get('item_')
+        cursor = con.execute(f'SELECT rbk_id, fullname FROM rbk_users WHERE village="{village}"')
+        rbk_users = [dict(each) for each in cursor.fetchall()]
+
+        return jsonify(rbk_users)
+
 
 #signup route
 @app.route('/signup')
 def signup():
     return render_template('signup')
-
-#contact us route
-@app.route('/contactus')
-def contactus():
-    return render_template('contactus')
-
 
 
 

@@ -2,6 +2,7 @@
 import sqlite3
 from functools import wraps
 from flask import Flask, g, request, session, redirect, url_for, jsonify, render_template
+import hashlib
 
 #configuring the flask app and jinja env
 app = Flask(__name__)
@@ -57,16 +58,13 @@ def login():
         if request.method=='POST':
             form = request.form
             form_phone = form['username']
-            form_password = form['password']
+            form_password = hashlib.sha256(bytes(form['password'],'utf-8') ).hexdigest()
 
             con = get_db()
-            cursor = con.execute('SELECT * FROM users')
-            rows = cursor.fetchall()
+            cursor = con.execute(f'SELECT * FROM users WHERE phone={form_phone}')
+            db_user = dict(cursor.fetchone())
 
-            for row in rows:
-                db_user = dict(row)
-
-                if form_phone == db_user['phone'] and form_password == db_user['password']:
+            if form_password == db_user['password']:
                     session['logged_in'] = True
                     del db_user['password']
                     session['active_user'] = db_user
@@ -86,6 +84,23 @@ def logout():
     return redirect('/login')
 
 
+#for selecting mandals and villages in registration
+@app.route('/get_place_info/<type_>')
+def get_places(type_):
+    con = get_db()
+    if type_=='mandal':
+        mandal = request.args.get('item_')
+        cursor = con.execute(f'SELECT DISTINCT village FROM places WHERE mandal="{mandal}"')
+        villages = [v for each in cursor.fetchall() for k,v in dict(each).items() ]
+
+        return jsonify(villages)
+    
+    if type_ =='village':
+        village = request.args.get('item_')
+        cursor = con.execute(f'SELECT rbk_id, fullname FROM rbk_users WHERE village="{village}"')
+        rbk_users = [dict(each) for each in cursor.fetchall()]
+
+        return jsonify(rbk_users)
 
 
 #signup route
@@ -96,15 +111,7 @@ def signup():
     cursor = con.execute('SELECT DISTINCT mandal FROM places;')
     mandals = [v for each in cursor.fetchall() for k,v in dict(each).items() ]
 
-    cursor = con.execute('SELECT village FROM places;')
-    villages = [v for each in cursor.fetchall() for k,v in dict(each).items() ]
-
-    return render_template('signup', mandals=mandals, villages=villages)
-
-#contact us route
-@app.route('/contactus')
-def contactus():
-    return render_template('contactus')
+    return render_template('signup', mandals=mandals)
 
 
 
@@ -184,7 +191,7 @@ def farmer_reg():
 
         con = get_db()
         con.execute('INSERT INTO users  (phone, password, user_type) VALUES (?,?,?)', 
-                    (data['phone'], data['password'], user_type))
+                    (data['phone'], hashlib.sha256(bytes(data['password'],'utf-8') ).hexdigest(), user_type))
         con.execute('INSERT INTO farmers  (rbk_id, fullname, phone, bank_ac, aadhaar_no, address, mandal, village) VALUES (?,?,?,?,?,?,?,?)', 
                     ( user_rbk_id, data['fullname'], data['phone'], data['bank_ac'], data['aadhaar_no'], data['address'], user_reg_mandal, user_reg_village))
         con.execute('INSERT INTO surveys  (phone, survey_no, land_capacity, land_passbook) VALUES (?,?,?,?)', 

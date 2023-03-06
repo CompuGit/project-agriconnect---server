@@ -15,6 +15,7 @@
                     {% block form %}{% endblock %}
                 </center>
                 <script>
+
                     const register = async (event) =>{
                             event.preventDefault()
                             const formData = Object.fromEntries([...new FormData(event.target).entries()]);

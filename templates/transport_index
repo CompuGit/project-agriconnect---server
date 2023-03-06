@@ -188,7 +188,6 @@
               <th>Vehicle Type</th>
               <th>Vehicle No.</th>
               <th>Trip Status</th>
-
             </tr>
             {% for row in queue %}
             <tr>

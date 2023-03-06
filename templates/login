@@ -101,7 +101,7 @@
 		<h1 style="text-align: center;"> {{ title }} Login Form</h1>
 		
 		<form id="login-form" action='/login' method="POST">
-			<input type="text" placeholder="Phone number, username, or email" name="username" required autocomplete="off">
+			<input type="text" placeholder="Phone number" name="username" required autocomplete="off" minlength="10" maxlength="10">
 			<input type="password" placeholder="Password" name="password" required>
 
             <canvas id="captcha" width="200" height="40"></canvas><br>

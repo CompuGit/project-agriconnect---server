@@ -14,18 +14,17 @@
 
         <form onsubmit="navigateToSelectedUrl(event);" >
             <center>
-                <select class="formo" name='mandal'>
+                <select class="formo" name='mandal'  onchange="get_villages(this.value)">
+                    <option>-</option>
                     {% for mandal in mandals %}
-                    <option value="{{ mandal }}">{{ mandal }}</option>
+                    <option value="{{ mandal }}" >{{ mandal }}</option>
                     {% endfor %}
                 </select>
-                <select class="formo" name="village">
-                    {% for village in villages %}
-                    <option value="{{ village }}">{{ village }}</option>
-                    {% endfor %}
+                <select class="formo" name="village" id="village_select" onchange="get_rbks(this.value)">
                 </select>
                 
-                <input type="text" name="registred_rbK_id" class="formo" placeholder="Registered RBK ID" style=" box-sizing: border-box;" >
+                <select name="registred_rbK_id" class="formo" id="rbk_select" >
+                </select>
                 
                 <select class="formo" id="select-opening">
                     <option style="color:grey">--Select--</option>
@@ -46,6 +45,29 @@
           const selectElement = document.getElementById("select-opening");
           const selectedUrl = selectElement.value.split("?")[0]; 
           window.location.href = selectedUrl + "?" + new URLSearchParams(new FormData(event.target)).toString();
+        }
+
+        const get_villages = async (mandal) =>{
+            const response = await fetch(`/get_place_info/mandal?item_=${mandal}`);
+            const data = await response.json()
+            village_select.innerText = ''
+            data.forEach(element => {
+                option_tag = document.createElement('option')
+                option_tag.value = element
+                option_tag.innerText = element
+                village_select.appendChild(option_tag)
+            });   
+        }
+        const get_rbks = async (village) =>{
+            const response = await fetch(`/get_place_info/village?item_=${village}`);
+            const data = await response.json()
+            rbk_select.innerText = ''
+            data.forEach(element => {
+                option_tag = document.createElement('option')
+                option_tag.value = element['rbk_id']
+                option_tag.innerText = element['rbk_id'] + '    ' + element['fullname']
+                rbk_select.appendChild(option_tag)
+            });  
         }
         </script>
         

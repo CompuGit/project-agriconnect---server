@@ -44,7 +44,6 @@
                 <th>Phone</th>
                 <th>Vehicle No.</th>
                 <th>Vehicle Type</th>
-  
               </tr>
               {% for row in queue %}
               <tr>

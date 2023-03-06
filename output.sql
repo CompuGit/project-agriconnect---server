@@ -127,9 +127,9 @@ CREATE TABLE users (
     phone TEXT,
     password TEXT,
     user_type TEXT);
-INSERT INTO "users" VALUES(1,'9876543210','123456','farmer');
-INSERT INTO "users" VALUES(2,'9988776655','123456','transport');
-INSERT INTO "users" VALUES(3,'9998887776','123456','ricemill');
+INSERT INTO "users" VALUES(1,'9876543210','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','farmer');
+INSERT INTO "users" VALUES(2,'9988776655','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','transport');
+INSERT INTO "users" VALUES(3,'9998887776','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','ricemill');
 
 CREATE TABLE rbk_users (
     rbk_id INTEGER PRIMARY KEY,
@@ -138,7 +138,7 @@ CREATE TABLE rbk_users (
     password TEXT,
     mandal TEXT,
     village TEXT);
-INSERT INTO "rbk_users" VALUES(1001,'RBK Bandar', '9999988888', '123456', 'Bandar', 'Chilakalapudi');
+INSERT INTO "rbk_users" VALUES(1001,'RBK Bandar', '9999988888', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'Bandar', 'Chilakalapudi');
 CREATE TABLE places (
     id INTEGER PRIMARY KEY,
     mandal TEXT,

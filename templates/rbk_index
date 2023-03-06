@@ -153,7 +153,6 @@ input[type="checkbox"]{
         else{
             rbk_btn.addEventListener('click', ()=>{entry_record('new')})
         }
-
     }
     const entry_record = async (type_)=>{
       qc_chekced = document.getElementById(selected_crop_id + '_qc_check')
