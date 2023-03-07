@@ -40,8 +40,13 @@
             </fieldset>
           
             <fieldset><legend > Crops info </legend>
-            <input type="date" name="cut_date" autocomplete="off" class="formo" placeholder="Crop cut date" required> 
-            <input type="date" name="qc_date" autocomplete="off" class="formo" placeholder="Crop quality check date" required>   
+            <span>Cut Date</span>
+            <input type="date" name="cut_date" autocomplete="off" class="formo" placeholder="Crop cut date" required>
+            <br>
+            <span>Quality Check Date</span>
+            <input type="date" name="qc_date" autocomplete="off" class="formo" placeholder="Crop quality check date" required>
+            <br>
+            <span>Sell Date</span>
             <input type="date" name="sell_date" autocomplete="off" class="formo" placeholder="Crop sale date" required> 
             </fieldset>
 
